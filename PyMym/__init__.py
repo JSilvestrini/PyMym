@@ -6,19 +6,17 @@ import inspect
 
 # TODO: Make it so that strings, ints, floats, and byte arrays can be passed in as the pattern, then make mask using it
 # TODO: Reduce the code for the memory scan, make a helper function that performs the search so all 3 scans can use it
-# TODO: Make a wrapper class, make methods, make Python methods, overload C++ functions to create a handled version of each function
-# TODO: EXAMPLE: read_bytes(HANDLE hProcess, ...), read_bytes(int pid, ....) {HANDLE hProcess = OpenProcess(pid) -> return read_bytes(hProcess, ...)}
-# TODO: Have the Python class keep a handle open to reduce function calls to OpenProcess, add in a close() and __exit__() method, check out "with PyMemProcess() as p:"
 # TODO: Add in a proxy class so that .float[mem_addr] and other datatypes can be used
-# TODO: add in open process and close process function within C++ file
 # TODO: Add in byte padding for odd bytes (ie. pad 5 -> 6, 3 -> 4, etc.), take ints and other data types for scanners, can pack them to bytes then create pattern
-# TODO: Make all function names Pythonic and PEP8
 # TODO: Make sure to add new functionality to the pyi file, update names in pyi and the test files
 # TODO: Add in tests for the new class
 # TODO: When slicing, add in a bunch of 0's if the user does not specify a fill value
+# TODO: Figure out how to do slicing since different data types require different bytes
 # TODO: For the AOBsearches, try and fit user given value into smallest signed data type, so try short, then int, long, longlong, or float, double in that order
 # TODO: Use the constraint checker function
 # TODO: Add in support for wide characters/ UTF-16
+# TODO: Refactor constraint and error check for writing functions
+# TODO: Check for other refactors
 
 def __check_constraint(data_type, signed=True):
     return (2 ** ((ctypes.sizeof(data_type) * 8) - 1) - 1) if signed else (2 ** (ctypes.sizeof(data_type) * 8) - 1)
@@ -667,56 +665,280 @@ class ProcessWrapper():
 
         return ret
 
-    def read_long():
-        ...
+    def read_long(self, addr=None):
+        if addr == None:
+            raise TypeError
 
-    def read_longlong():
-        ...
+        val = __PyMym.handledReadBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_long))
+        ret = 0
 
-    def read_uint():
-        ...
+        if self.__big_endian:
+            ret = struct.unpack(">l", bytes(val))[0]
+        else:
+            ret = struct.unpack("<l", bytes(val))[0]
 
-    def read_ushort():
-        ...
+        return ret
 
-    def read_ulong():
-        ...
+    def read_longlong(self, addr=None):
+        if addr == None:
+            raise TypeError
 
-    def read_ulonglong():
-        ...
+        val = __PyMym.handledReadBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_longlong))
+        ret = 0
 
-    def write_bytes():
-        ...
+        if self.__big_endian:
+            ret = struct.unpack(">q", bytes(val))[0]
+        else:
+            ret = struct.unpack("<q", bytes(val))[0]
 
-    def write_float():
-        ...
+        return ret
 
-    def write_double():
-        ...
+    def read_uint(self, addr=None):
+        if addr == None:
+            raise TypeError
 
-    def write_short():
-        ...
+        val = __PyMym.handledReadBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_uint))
+        ret = 0
 
-    def write_int():
-        ...
+        if self.__big_endian:
+            ret = struct.unpack(">I", bytes(val))[0]
+        else:
+            ret = struct.unpack("<I", bytes(val))[0]
 
-    def write_long():
-        ...
+        return ret
 
-    def write_longlong():
-        ...
+    def read_ushort(self, addr=None):
+        if addr == None:
+            raise TypeError
 
-    def write_uint():
-        ...
+        val = __PyMym.handledReadBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_ushort))
+        ret = 0
 
-    def write_ushort():
-        ...
+        if self.__big_endian:
+            ret = struct.unpack(">H", bytes(val))[0]
+        else:
+            ret = struct.unpack("<H", bytes(val))[0]
 
-    def write_ulong():
-        ...
+        return ret
 
-    def write_ulonglong():
-        ...
+    def read_ulong(self, addr=None):
+        if addr == None:
+            raise TypeError
+
+        val = __PyMym.handledReadBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_ulong))
+        ret = 0
+
+        if self.__big_endian:
+            ret = struct.unpack(">L", bytes(val))[0]
+        else:
+            ret = struct.unpack("<L", bytes(val))[0]
+
+        return ret
+
+    def read_ulonglong(self, addr=None):
+        if addr == None:
+            raise TypeError
+
+        val = __PyMym.handledReadBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_ulonglong))
+        ret = 0
+
+        if self.__big_endian:
+            ret = struct.unpack(">Q", bytes(val))[0]
+        else:
+            ret = struct.unpack("<Q", bytes(val))[0]
+
+        return ret
+
+    def write_bytes(self, addr=None, val=None):
+        if val == None:
+            raise TypeError
+
+        if addr == None:
+            raise TypeError
+
+        bytes_to_write = __create_byte_pattern(val, hex_string=True)
+        return __PyMym.handledriteBytes(self.__handle, addr, 1, bytes_to_write)
+
+
+    def write_float(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_float]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">f", val)
+        else:
+            bytes_to_write = struct.pack("<f", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_float), fin_val)
+
+    def write_double(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_double]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">d", val)
+        else:
+            bytes_to_write = struct.pack("<d", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_double), fin_val)
+
+    def write_short(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_short]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">h", val)
+        else:
+            bytes_to_write = struct.pack("<h", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_short), fin_val)
+
+    def write_int(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_int]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">i", val)
+        else:
+            bytes_to_write = struct.pack("<i", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_int), fin_val)
+
+    def write_long(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_long]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">l", val)
+        else:
+            bytes_to_write = struct.pack("<l", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_long), fin_val)
+
+    def write_longlong(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_longlong]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">q", val)
+        else:
+            bytes_to_write = struct.pack("<q", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_longlong), fin_val)
+
+    def write_uint(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_uint]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">I", val)
+        else:
+            bytes_to_write = struct.pack("<I", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_uint), fin_val)
+
+    def write_ushort(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_ushort]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">H", val)
+        else:
+            bytes_to_write = struct.pack("<H", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_ushort), fin_val)
+
+    def write_ulong(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_ulong]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">L", val)
+        else:
+            bytes_to_write = struct.pack("<L", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_ulong), fin_val)
+
+    def write_ulonglong(self, addr=None, val=None):
+        if addr == None:
+            raise TypeError
+        if val == None:
+            raise TypeError
+        if abs(val) > __constraint_map[ctypes.c_ulonglong]:
+            raise OverflowError()
+
+        bytes_to_write = bytes()
+        if self.__big_endian:
+            bytes_to_write = struct.pack(">Q", val)
+        else:
+            bytes_to_write = struct.pack("<Q", val)
+
+        fin_val = __create_byte_pattern(pattern=bytes_to_write)
+
+        return __PyMym.handledWriteBytes(self.__handle, addr, ctypes.sizeof(ctypes.c_ulonglong), fin_val)
 
     def module_aob_scan():
         ...
@@ -727,11 +949,11 @@ class ProcessWrapper():
     def heap_aob_scan():
         ...
 
-    def get_pid():
-        ...
+    def get_pid(self):
+        return self.__pid
 
-    def get_application_name():
-        ...
+    def get_application_name(self):
+        return self.__application_name
 
-    def get_modules():
-        ...
+    def get_modules(self):
+        return __PyMym.handledGetModules(self.__handle)
