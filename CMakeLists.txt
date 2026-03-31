@@ -21,10 +21,8 @@ message(STATUS "Using pybind11 found at: ${pybind11_DIR}")
 find_package(pybind11 REQUIRED)
 
 pybind11_add_module(PyMym SHARED src/PyMym.cpp)
-pybind11_add_module(PyMymTests SHARED src/PyMymTests.cpp)
 
 set_target_properties(PyMym PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON)
-set_target_properties(PyMymTests PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON)
 
 set(INIT_PY "${CMAKE_CURRENT_BINARY_DIR}/__init__.py")
 if(NOT EXISTS ${INIT_PY})
@@ -35,10 +33,4 @@ add_custom_command(TARGET PyMym POST_BUILD
 COMMAND ${CMAKE_COMMAND} -E copy
 $<TARGET_FILE_DIR:PyMym>/$<TARGET_FILE_NAME:PyMym>
 ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:PyMym>
-)
-
-add_custom_command(TARGET PyMymTests POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E copy
-$<TARGET_FILE_DIR:PyMym>/$<TARGET_FILE_NAME:PyMymTests>
-${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:PyMymTests>
 )
