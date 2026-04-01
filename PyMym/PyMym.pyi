@@ -1,15 +1,29 @@
-from typing import List
 import typing
-from typing import overload
+from typing import overload, List, Literal
+import ctypes
 
-__pattern_type = typing.Union[
+PATTERN_TYPE = typing.Union[
     str, 
     bytes, 
     List[typing.SupportsInt]
 ]
 
+ALLOWED_DATA_TYPES = Literal[
+    ctypes.c_byte,
+    ctypes.c_int,
+    ctypes.c_short,
+    ctypes.c_long,
+    ctypes.c_longlong,
+    ctypes.c_float,
+    ctypes.c_double,
+    ctypes.c_uint,
+    ctypes.c_ushort,
+    ctypes.c_ulong,
+    ctypes.c_ulonglong
+]
+
 @overload
-def module_aob_scan(pid: typing.SupportsInt, module_name: str, pattern: __pattern_type, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
+def module_aob_scan(pid: typing.SupportsInt, module_name: str, pattern: PATTERN_TYPE, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
     """
     Searches memory within the given module of a process.\n
     Takes a byte pattern and returns the location in memory of the byte pattern if found, otherwise 0.\n
@@ -28,7 +42,7 @@ def module_aob_scan(pid: typing.SupportsInt, module_name: str, pattern: __patter
     ```
     """
 @overload
-def module_aob_scan(application_name: str, module_name: str, pattern: __pattern_type, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
+def module_aob_scan(application_name: str, module_name: str, pattern: PATTERN_TYPE, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
     """"""
 @overload
 def get_modules(pid: typing.SupportsInt) -> list[str]:
@@ -45,7 +59,7 @@ def get_process_name(pid: typing.SupportsInt) -> str:
 def get_process_names() -> list[str]:
     """Returns a list of names for all running processes, restricted processes are excluded"""
 @overload
-def heap_aob_scan(pid: typing.SupportsInt, pattern: __pattern_type, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
+def heap_aob_scan(pid: typing.SupportsInt, pattern: PATTERN_TYPE, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
     """
     Searches within the heap memory of the given process.\n
     Takes a byte pattern and returns the location in memory of the byte pattern if found, otherwise 0.\n
@@ -64,9 +78,9 @@ def heap_aob_scan(pid: typing.SupportsInt, pattern: __pattern_type, mask: str  =
     ```
     """
 @overload
-def heap_aob_scan(application_name: str, pattern: __pattern_type, mask: str = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int: ...
+def heap_aob_scan(application_name: str, pattern: PATTERN_TYPE, mask: str = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int: ...
 @overload
-def stack_aob_scan(pid: typing.SupportsInt, pattern: __pattern_type, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
+def stack_aob_scan(pid: typing.SupportsInt, pattern: PATTERN_TYPE, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
     """
     Searches within the stack memory of the given process.\n
     Takes a byte pattern and returns the location in memory of the byte pattern if found, otherwise 0.\n
@@ -85,7 +99,7 @@ def stack_aob_scan(pid: typing.SupportsInt, pattern: __pattern_type, mask: str  
     ```
     """
 @overload
-def stack_aob_scan(application_name: str, pattern: __pattern_type, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int: ...
+def stack_aob_scan(application_name: str, pattern: PATTERN_TYPE, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int: ...
 @overload
 def read_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt, num_bytes: typing.SupportsInt, flip_endian: bool = False) -> list[int]:
     """Returns the n bytes at the given address in a process"""
@@ -129,7 +143,7 @@ def read_short(pid: typing.SupportsInt, memory_address: typing.SupportsInt, big_
 def read_short(application_name: str, memory_address: typing.SupportsInt, big_endian: bool = False) -> int:
     """"""
 @overload
-def write_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt, bytes: __pattern_type, hex_string: bool = False, flip_endian: bool = False) -> bool:
+def write_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt, bytes: PATTERN_TYPE, hex_string: bool = False, flip_endian: bool = False) -> bool:
     """
     Writes a sequence of bytes to a given location in a process, returns true if the operation succeeded.\n
     Example:
@@ -142,7 +156,7 @@ def write_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt, byt
     ```
     """
 @overload
-def write_bytes(application_name: str, memory_address: typing.SupportsInt, bytes: __pattern_type, hex_string: bool = False, flip_endian: bool = False) -> bool:
+def write_bytes(application_name: str, memory_address: typing.SupportsInt, bytes: PATTERN_TYPE, hex_string: bool = False, flip_endian: bool = False) -> bool:
     """"""
 @overload
 def write_double(pid: typing.SupportsInt, memory_address: typing.SupportsInt, val: typing.SupportsFloat, big_endian: bool = False) -> bool:
@@ -230,9 +244,10 @@ def write_ulonglong(application_name: str, memory_address: typing.SupportsInt, v
     """"""
 
 class MemoryProxy:
-    def __getitem__(self, addr: typing.SupportsInt) -> int | list[int] | float | list[float]:
+    def __getitem__(self, key: typing.SupportsInt) -> int | float | list[int] | list[float]:
         ...
-    def __setitem_(self, addr: typing.SupportsInt, val: int | float | list[float] | __pattern_type) -> bool:
+
+    def __setitem__(self, key: typing.SupportsInt, val: typing.SupportsInt | typing.SupportsFloat) -> bool:
         ...
 
 class ProcessWrapper:
@@ -253,7 +268,7 @@ class ProcessWrapper:
         ...
 
     @overload
-    def __init__(self, application_name: str) -> ProcessWrapper:
+    def __init__(self, application_name: str, big_endian: bool = False) -> ProcessWrapper:
         ...
 
     def __enter__(self) -> ProcessWrapper:
@@ -265,4 +280,116 @@ class ProcessWrapper:
     def __delete__(self) -> None:
         ...
 
-    
+    def __repr__(self) -> str:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+    def __bool__(self) -> bool:
+        ...
+
+    def __getitem__(self, key) -> list[int]:
+        ...
+
+    def __setitem__(self, key, val: list[int] | int) -> bool:
+        ...
+
+    def __eq__(self, other) -> bool:
+        ...
+
+    def close(self) -> None:
+        ...
+
+    def set_endian(self, new_endian="little") -> None:
+        ...
+
+    def read_datatype(self, addr: typing.SupportsInt, data_type: ALLOWED_DATA_TYPES) -> list[int] | int | float:
+        ...
+
+    def write_datatype(self, addr: typing.SupportsInt, data_type: ALLOWED_DATA_TYPES, val: list[int] | int | float) -> bool:
+        ...
+
+    def read_bytes(self, addr: typing.SupportsInt = None, n: typing.SupportsInt = 1) -> list[int]:
+        ...
+
+    def read_float(self, addr: typing.SupportsInt = None) -> float:
+        ...
+
+    def read_double(self, addr: typing.SupportsInt = None) -> float:
+        ...
+
+    def read_short(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def read_int(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def read_long(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def read_longlong(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def read_uint(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def read_ushort(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def read_ulong(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def read_ulonglong(self, addr: typing.SupportsInt = None) -> int:
+        ...
+
+    def write_bytes(self, addr: typing.SupportsInt = None, val: PATTERN_TYPE = None, size: int = 1, overwrite_endian: bool = False) -> bool:
+        ...
+
+    def write_float(self, addr: typing.SupportsInt = None, val: typing.SupportsFloat = None) -> bool:
+        ...
+
+    def write_double(self, addr: typing.SupportsInt = None, val: typing.SupportsFloat = None) -> bool:
+        ...
+
+    def write_short(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def write_int(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def write_long(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def write_longlong(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def write_uint(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def write_ushort(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def write_ulong(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def write_ulonglong(self, addr: typing.SupportsInt = None, val: typing.SupportsInt = None) -> bool:
+        ...
+
+    def module_aob_scan(self, module_name : str = None, pattern: PATTERN_TYPE = None, mask: str = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False):
+        ...
+
+    def stack_aob_scan(self, pattern: PATTERN_TYPE = None, mask: str = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False):
+        ...
+
+    def heap_aob_scan(self, pattern: PATTERN_TYPE = None, mask: str = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False):
+        ...
+
+    def get_pid(self) -> int:
+        ...
+
+    def get_application_name(self) -> str:
+        ...
+
+    def get_modules(self) -> list[str]:
+        ...

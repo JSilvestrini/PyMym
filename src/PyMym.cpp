@@ -97,7 +97,7 @@ std::vector<unsigned long> getPIDs() {
 
 std::string getProcessName(unsigned long pid) {
     std::string ret;
-    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, (DWORD)pid);
     char szProcessName[MAX_PATH];
 
     if (GetProcessImageFileNameA(hProcess, szProcessName, MAX_PATH)) {
@@ -127,20 +127,21 @@ std::vector<std::string> getProcessNames() {
     return ret;
 }
 
-std::vector<std::string> handledGetModules(HANDLE hProcess) {
+std::vector<std::string> handledGetModules(intptr_t hProcess) {
+    HANDLE hnProcess = reinterpret_cast<HANDLE>(hProcess);
     std::vector<std::string> ret{};
 
     HMODULE hMods[1024];
     DWORD cbNeeded;
 
-    if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
+    if (!EnumProcessModules(hnProcess, hMods, sizeof(hMods), &cbNeeded)) {
         return ret;
     }
 
     for (int i = 0; i < cbNeeded / sizeof(HMODULE); i++) {
         char szModName[MAX_PATH];
 
-        if (!GetModuleFileNameExA(hProcess, hMods[i], szModName, MAX_PATH)) {
+        if (!GetModuleFileNameExA(hnProcess, hMods[i], szModName, MAX_PATH)) {
             return ret;
         }
 
@@ -163,7 +164,8 @@ std::vector<std::string> getModules(unsigned long pid) {
     std::vector<std::string> ret{};
 
     DWORD processID = (DWORD)pid;
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    HANDLE hnProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    intptr_t hProcess = reinterpret_cast<intptr_t>(hnProcess);
 
     if (!hProcess) {
         return ret;
@@ -171,7 +173,7 @@ std::vector<std::string> getModules(unsigned long pid) {
 
     handledGetModules(hProcess);
 
-    CloseHandle(hProcess);
+    CloseHandle(hnProcess);
 
     return ret;
 }
@@ -193,7 +195,8 @@ std::vector<std::string> getModules(const char* application) {
     return getModules(pid);
 }
 
-intptr_t handledStackAOBScan(unsigned long pid, HANDLE hProcess, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
+intptr_t handledStackAOBScan(intptr_t hProcess, unsigned long pid, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
+    HANDLE hnProcess = reinterpret_cast<HANDLE>(hProcess);
     intptr_t fRet = 0;
     HANDLE hThreadSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
 
@@ -266,12 +269,12 @@ intptr_t handledStackAOBScan(unsigned long pid, HANDLE hProcess, const std::vect
         intptr_t base = 0;
         intptr_t limit = 0;
 
-        if (!ReadProcessMemory(hProcess, (LPCVOID)((intptr_t)TBI.TebBaseAddress + 0x08), &base, sizeof(base), NULL)) {
+        if (!ReadProcessMemory(hnProcess, (LPCVOID)((intptr_t)TBI.TebBaseAddress + 0x08), &base, sizeof(base), NULL)) {
             ResumeThread(thread);
             continue;
         }
 
-        if (!ReadProcessMemory(hProcess, (LPCVOID)((intptr_t)TBI.TebBaseAddress + 0x10), &limit, sizeof(limit), NULL)) {
+        if (!ReadProcessMemory(hnProcess, (LPCVOID)((intptr_t)TBI.TebBaseAddress + 0x10), &limit, sizeof(limit), NULL)) {
             ResumeThread(thread);
             continue;
         }
@@ -284,7 +287,7 @@ intptr_t handledStackAOBScan(unsigned long pid, HANDLE hProcess, const std::vect
         std::vector<byte> data(base - rsp);
         SIZE_T bytesRead = 0;
 
-        if (!ReadProcessMemory(hProcess, (LPCVOID)(rsp), data.data(), base - rsp, &bytesRead)) {
+        if (!ReadProcessMemory(hnProcess, (LPCVOID)(rsp), data.data(), base - rsp, &bytesRead)) {
             ResumeThread(thread);
             continue;
         }
@@ -329,15 +332,17 @@ intptr_t handledStackAOBScan(unsigned long pid, HANDLE hProcess, const std::vect
 }
 
 intptr_t stackAOBScan(unsigned long pid, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, (DWORD)pid);
+    DWORD processID = (DWORD)pid;
+    HANDLE hnProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    intptr_t hProcess = reinterpret_cast<intptr_t>(hnProcess);
 
-    if (!hProcess) {
+    if (!hnProcess) {
         return 0;
     }
 
-    intptr_t fRet = handledStackAOBScan(pid, hProcess, lpPattern, pszMask, offset, resultUsage);
+    intptr_t fRet = handledStackAOBScan(hProcess, pid, lpPattern, pszMask, offset, resultUsage);
 
-    CloseHandle(hProcess);
+    CloseHandle(hnProcess);
     return fRet;
 }
 
@@ -346,11 +351,12 @@ intptr_t stackAOBScan(const char* application, const std::vector<uint8_t>& lpPat
     return stackAOBScan(pid, lpPattern, pszMask, offset, resultUsage);
 }
 
-intptr_t handledHeapAOBScan(HANDLE hProcess, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
+intptr_t handledHeapAOBScan(intptr_t hProcess, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
+    HANDLE hnProcess = reinterpret_cast<HANDLE>(hProcess);
     MEMORY_BASIC_INFORMATION mbi{};
     intptr_t address = 0;
 
-    while (VirtualQueryEx(hProcess, (LPCVOID)address, &mbi, sizeof(mbi))) {
+    while (VirtualQueryEx(hnProcess, (LPCVOID)address, &mbi, sizeof(mbi))) {
         address += mbi.RegionSize;
         if ((mbi.State != MEM_COMMIT) || (mbi.Protect & PAGE_GUARD) || (mbi.Protect & PAGE_NOACCESS) || (mbi.Type != MEM_PRIVATE)) {
             continue;
@@ -359,7 +365,7 @@ intptr_t handledHeapAOBScan(HANDLE hProcess, const std::vector<uint8_t>& lpPatte
         std::vector<byte> data(mbi.RegionSize);
         SIZE_T bytesRead = 0;
 
-        if (!ReadProcessMemory(hProcess, (LPCVOID)(mbi.BaseAddress), data.data(), mbi.RegionSize, &bytesRead)) {
+        if (!ReadProcessMemory(hnProcess, (LPCVOID)(mbi.BaseAddress), data.data(), mbi.RegionSize, &bytesRead)) {
             continue;
         }
 
@@ -392,15 +398,17 @@ intptr_t handledHeapAOBScan(HANDLE hProcess, const std::vector<uint8_t>& lpPatte
 }
 
 intptr_t heapAOBScan(unsigned long pid, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, (DWORD)pid);
+    DWORD processID = (DWORD)pid;
+    HANDLE hnProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    intptr_t hProcess = reinterpret_cast<intptr_t>(hnProcess);
 
-    if (!hProcess) {
+    if (!hnProcess) {
         return 0;
     }
 
     intptr_t fRet = handledHeapAOBScan(hProcess, lpPattern, pszMask, offset,  resultUsage);
 
-    CloseHandle(hProcess);
+    CloseHandle(hnProcess);
     return fRet;
 }
 
@@ -409,19 +417,20 @@ intptr_t heapAOBScan(const char* application, const std::vector<uint8_t>& lpPatt
     return heapAOBScan(pid, lpPattern, pszMask, offset, resultUsage);
 }
 
-intptr_t handledModuleAOBScan(HANDLE hProcess, const char* moduleName, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
+intptr_t handledModuleAOBScan(intptr_t hProcess, const char* moduleName, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
+    HANDLE hnProcess = reinterpret_cast<HANDLE>(hProcess);
     HMODULE hMods[1024];
     DWORD cbNeeded;
     int i = 0;
 
-    if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
+    if (!EnumProcessModules(hnProcess, hMods, sizeof(hMods), &cbNeeded)) {
         return 0;
     }
 
     for (i; i < cbNeeded / sizeof(HMODULE); i++) {
         WCHAR szModName[MAX_PATH];
 
-        if (!GetModuleFileNameExW(hProcess, hMods[i], szModName, MAX_PATH)) {
+        if (!GetModuleFileNameExW(hnProcess, hMods[i], szModName, MAX_PATH)) {
             continue;
         }
 
@@ -442,7 +451,7 @@ intptr_t handledModuleAOBScan(HANDLE hProcess, const char* moduleName, const std
     DWORD64 moduleBaseAddress = NULL;
     DWORD64 moduleSize = NULL;
 
-    if (GetModuleInformation(hProcess, hMods[i], &modInfo, sizeof(modInfo))) {
+    if (GetModuleInformation(hnProcess, hMods[i], &modInfo, sizeof(modInfo))) {
         moduleBaseAddress = (DWORD64)modInfo.lpBaseOfDll;
         moduleSize = modInfo.SizeOfImage;
     }
@@ -452,11 +461,11 @@ intptr_t handledModuleAOBScan(HANDLE hProcess, const char* moduleName, const std
         SIZE_T bytesRead = 0;
         DWORD oldProtect;
 
-        if (!VirtualProtectEx(hProcess, (LPVOID)(moduleBaseAddress), moduleSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
+        if (!VirtualProtectEx(hnProcess, (LPVOID)(moduleBaseAddress), moduleSize, PAGE_EXECUTE_READWRITE, &oldProtect)) {
             return 0;
         }
 
-        if (!ReadProcessMemory(hProcess, (LPCVOID)(moduleBaseAddress), data.data(), moduleSize, &bytesRead)) {
+        if (!ReadProcessMemory(hnProcess, (LPCVOID)(moduleBaseAddress), data.data(), moduleSize, &bytesRead)) {
             return 0;
         }
 
@@ -476,7 +485,7 @@ intptr_t handledModuleAOBScan(HANDLE hProcess, const char* moduleName, const std
             }
 
             if (resultCnt == resultUsage || resultUsage == 0) {
-                VirtualProtectEx(hProcess, (LPVOID)(moduleBaseAddress), moduleSize, oldProtect, &oldProtect);
+                VirtualProtectEx(hnProcess, (LPVOID)(moduleBaseAddress), moduleSize, oldProtect, &oldProtect);
                 return (std::distance(data.begin(), ret) + moduleBaseAddress) + offset;
             }
 
@@ -503,15 +512,16 @@ intptr_t handledModuleAOBScan(HANDLE hProcess, const char* moduleName, const std
  */
 intptr_t moduleAOBScan(unsigned long pid, const char* moduleName, const std::vector<uint8_t>& lpPattern, const char* pszMask, intptr_t offset, intptr_t resultUsage) {
     DWORD processID = (DWORD)pid;
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    HANDLE hnProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    intptr_t hProcess = reinterpret_cast<intptr_t>(hnProcess);
 
-    if (!hProcess) {
+    if (!hnProcess) {
         return 0;
     }
 
     intptr_t fRet = handledModuleAOBScan(hProcess, moduleName, lpPattern, pszMask, offset, resultUsage);
 
-    CloseHandle(hProcess);
+    CloseHandle(hnProcess);
 
     return fRet;
 }
@@ -539,11 +549,12 @@ intptr_t moduleAOBScan(const char* application, const char* moduleName, const st
     return moduleAOBScan(pid, moduleName, lpPattern, pszMask, offset, resultUsage);
 }
 
-std::vector<unsigned char> handledReadBytes(HANDLE hProcess, intptr_t address, int n) {
+std::vector<unsigned char> handledReadBytes(intptr_t hProcess, intptr_t address, int n) {
+    HANDLE hnProcess = reinterpret_cast<HANDLE>(hProcess);
     unsigned char* buffer = new unsigned char[n];
     SIZE_T bytesRead;
 
-    if (!ReadProcessMemory(hProcess, (LPCVOID)(address), buffer, n, &bytesRead)) {
+    if (!ReadProcessMemory(hnProcess, (LPCVOID)(address), buffer, n, &bytesRead)) {
         return std::vector<unsigned char>();
     }
 
@@ -565,15 +576,16 @@ std::vector<unsigned char> handledReadBytes(HANDLE hProcess, intptr_t address, i
  */
 std::vector<unsigned char> readBytes(unsigned long pid, intptr_t address, int n) {
     DWORD processID = (DWORD)pid;
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    HANDLE hnProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    intptr_t hProcess = reinterpret_cast<intptr_t>(hnProcess);
 
-    if (!hProcess) {
+    if (!hnProcess) {
         return std::vector<unsigned char>();
     }
 
     std::vector<unsigned char> fRet = handledReadBytes(hProcess, address, n);
 
-    CloseHandle(hProcess);
+    CloseHandle(hnProcess);
 
     return fRet;
 }
@@ -588,12 +600,13 @@ std::vector<unsigned char> readBytes(const char* application, intptr_t address, 
     return readBytes(pid, address, n);
 }
 
-bool handledWriteBytes(HANDLE hProcess, intptr_t address, int n, const std::vector<unsigned char>& bytes) {
+bool handledWriteBytes(intptr_t hProcess, intptr_t address, int n, const std::vector<unsigned char>& bytes) {
+    HANDLE hnProcess = reinterpret_cast<HANDLE>(hProcess);
     unsigned char* buffer = new unsigned char[n];
     std::copy(bytes.begin(), bytes.end(), buffer);
     SIZE_T bytesWritten;
 
-    WriteProcessMemory(hProcess, (LPVOID)(address), buffer, n, &bytesWritten);
+    WriteProcessMemory(hnProcess, (LPVOID)(address), buffer, n, &bytesWritten);
 
     delete buffer;
 
@@ -602,15 +615,16 @@ bool handledWriteBytes(HANDLE hProcess, intptr_t address, int n, const std::vect
 
 bool writeBytes(unsigned long pid, intptr_t address, int n, const std::vector<unsigned char>& bytes) {
     DWORD processID = (DWORD)pid;
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    HANDLE hnProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    intptr_t hProcess = reinterpret_cast<intptr_t>(hnProcess);
 
-    if (!hProcess) {
+    if (!hnProcess) {
         return false;
     }
 
     bool fRet = handledWriteBytes(hProcess, address, n, bytes);
 
-    CloseHandle(hProcess);
+    CloseHandle(hnProcess);
 
     return fRet;
 }
@@ -625,13 +639,15 @@ bool writeBytes(const char* application, intptr_t address, int n, const std::vec
     return writeBytes(pid, address, n, bytes);
 }
 
-HANDLE openProcess(unsigned long pid) {
+intptr_t openProcess(unsigned long pid) {
     DWORD processID = (DWORD)pid;
-    return OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
+    return reinterpret_cast<intptr_t>(hProcess);
 }
 
-bool closeProcess(HANDLE hProcess) {
-    return CloseHandle(hProcess);
+bool closeProcess(intptr_t hProcess) {
+    HANDLE hnProcess = reinterpret_cast<HANDLE>(hProcess);
+    return CloseHandle(hnProcess);
 }
 
 PYBIND11_MODULE(PyMym, m) {
@@ -663,18 +679,18 @@ PYBIND11_MODULE(PyMym, m) {
         py::arg("pid"), py::arg("pattern"), py::arg("mask"), py::arg("offset") = 0, py::arg("retult_instance") = 0);
     m.def("stackAOBScan", (intptr_t (*)(const char*, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &stackAOBScan,
         py::arg("application_name"), py::arg("pattern"), py::arg("mask"), py::arg("offset") = 0, py::arg("retult_instance") = 0);
-    m.def("handledModuleAOBScan", (intptr_t (*)(HANDLE, const char*, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &handledModuleAOBScan, 
+    m.def("handledModuleAOBScan", (intptr_t (*)(intptr_t, const char*, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &handledModuleAOBScan, 
         py::arg("process_handle"), py::arg("module_name"), py::arg("pattern"), py::arg("mask"), py::arg("offset") = 0, py::arg("result_instance") = 0);
-    m.def("handledReadBytes",(std::vector<unsigned char> (*)(HANDLE, intptr_t, int)) &handledReadBytes,
+    m.def("handledReadBytes",(std::vector<unsigned char> (*)(intptr_t, intptr_t, int)) &handledReadBytes,
         py::arg("process_handle"), py::arg("memory_address"), py::arg("num_bytes"));
-    m.def("handledWriteBytes", (bool (*)(HANDLE, intptr_t, int, const std::vector<unsigned char>&)) &handledWriteBytes,
+    m.def("handledWriteBytes", (bool (*)(intptr_t, intptr_t, int, const std::vector<unsigned char>&)) &handledWriteBytes,
         py::arg("process_handle"), py::arg("memory_address"), py::arg("num_bytes"), py::arg("bytes"));
-    m.def("handledHeapAOBScan", (intptr_t (*)(HANDLE, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &handledHeapAOBScan,
+    m.def("handledHeapAOBScan", (intptr_t (*)(intptr_t, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &handledHeapAOBScan,
         py::arg("process_handle"), py::arg("pattern"), py::arg("mask"), py::arg("offset") = 0, py::arg("retult_instance") = 0);
-    m.def("handledStackAOBScan", (intptr_t (*)(HANDLE, unsigned long, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &handledStackAOBScan,
+    m.def("handledStackAOBScan", (intptr_t (*)(intptr_t, unsigned long, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &handledStackAOBScan,
         py::arg("process_handle"), py::arg("pid"), py::arg("pattern"), py::arg("mask"), py::arg("offset") = 0, py::arg("retult_instance") = 0);
-    m.def("openProcess", (HANDLE (*)(unsigned long)) &openProcess, py::arg("pid"));
-    m.def("openProcess", (bool (*)(HANDLE)) &closeProcess, py::arg("process_handle"));
-    m.def("handledGetModules", (std::vector<std::string> (*)(HANDLE)) &handledGetModules,
+    m.def("openProcess", (intptr_t (*)(unsigned long)) &openProcess, py::arg("pid"));
+    m.def("closeProcess", (bool (*)(intptr_t)) &closeProcess, py::arg("process_handle"));
+    m.def("handledGetModules", (std::vector<std::string> (*)(intptr_t)) &handledGetModules,
         py::arg("process_handle"));
 }
