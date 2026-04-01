@@ -301,7 +301,7 @@ class ProcessWrapper:
     def close(self) -> None:
         ...
 
-    def set_endian(self, new_endian="little") -> None:
+    def set_endian(self, new_endian: Literal["little", "big"] = "little") -> None:
         ...
 
     def read_datatype(self, addr: typing.SupportsInt, data_type: ALLOWED_DATA_TYPES) -> list[int] | int | float:

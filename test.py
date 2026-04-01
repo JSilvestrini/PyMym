@@ -26,5 +26,7 @@ if __name__ == "__main__":
     print(pw[addr:addr+8:2])
     print(pw[addr:addr+8:4])
     print(pw.longlong[addr])
+    pw.u_longlong[addr:addr+2] = [0xBEEFDEADFEEDCAFE, 0xFEEFDEEDCFEEA333]
+    print(pw.longlong[addr:addr+2])
 
     proc.wait()
