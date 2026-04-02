@@ -23,10 +23,12 @@ if __name__ == "__main__":
 
     print(addr)
     print(pw[addr:addr+8])
-    print(pw[addr:addr+8:2])
-    print(pw[addr:addr+8:4])
+    print(pw[addr:addr+8])
+    pw[addr:addr+8] = [255, 255, 255, 255]
+    print(pw[addr:addr+8])
     print(pw.longlong[addr])
-    pw.u_longlong[addr:addr+2] = [0xBEEFDEADFEEDCAFE, 0xFEEFDEEDCFEEA333]
-    print(pw.longlong[addr:addr+2])
+    pw.ulonglong[addr:addr+12] = [0xBEEFDEADFEEDCAFE, 0xFEEFDEEDCFEEA333]
+    print([hex(0xBEEFDEADFEEDCAFE), hex(0xFEEFDEEDCFEEA333)])
+    print([hex(x) for x in pw.ulonglong[addr:addr+12]])
 
-    proc.wait()
+    proc.terminate()
