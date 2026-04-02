@@ -13,6 +13,7 @@ import inspect
 # TODO: Check for other refactors
 
 # TODO: Update all descriptions in PyMym.pyi and make sure they match the functions
+# TODO: Make it so that if n is 1 for read or write it will return the value and not a list
 
 
 def __check_constraint(data_type, signed=True):
