@@ -36,3 +36,4 @@ if __name__ == "__main__":
     print(type([0xBEEF00000000CAFE]))
 
     proc.terminate()
+    print(pm.get_modules(pid=os.getpid()))

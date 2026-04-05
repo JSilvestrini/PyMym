@@ -372,6 +372,9 @@ class ProcessWrapper:
     def set_endian(self, new_endian: Literal["little", "big"] = "little") -> None:
         """Changes the endian-ness of the wrapper"""
 
+    def get_endian(self) -> Literal["little", "big"]:
+        """Returns the current endian-ness of the wrapper"""
+
     def read_bytes(self, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1) -> int | list[int]:
         """Reads 'n' bytes at the given 'memory_address'"""
 

@@ -243,12 +243,8 @@ def module_aob_scan(target=None, module_name=None, pattern=None, mask=None, offs
         fin_mask = "x" * len(byte_pattern)
     return _PyMym.moduleAOBScan(__final_target(**kwargs), module_name, byte_pattern, fin_mask, offset, result_instance)
 
-def get_modules(target, **kwargs):
-    pid = kwargs.get('pid', target)
-    application_name = kwargs.get('application_name')
-
-    function_target = pid if pid is not None else application_name
-    return _PyMym.getModules(function_target)
+def get_modules(target=None, **kwargs):
+    return _PyMym.getModules(__final_target(**kwargs))
 
 def get_pid(application_name):
     return _PyMym.getPID(application_name)
@@ -353,14 +349,14 @@ def read_short(target=None, memory_address=None, big_endian=False, n=1, **kwargs
         ret.append(unpack_short(val[i * ctypes.sizeof(ctypes.c_short) : (i + 1) * ctypes.sizeof(ctypes.c_short)], big_endian=big_endian))
     return ret if len(ret) > 1 else ret[0]
 
-def write_bytes(target=None, memory_address=None, bytes=None, hex_string=False, flip_endian=False, n=1, **kwargs):
-    if bytes == None:
+def write_bytes(target=None, memory_address=None, val=None, hex_string=False, flip_endian=False, n=1, **kwargs):
+    if val == None:
         raise TypeError
 
     if memory_address == None:
         raise TypeError
 
-    bytes_to_write = _create_byte_pattern(bytes, hex_string=hex_string, flip_endian=flip_endian)
+    bytes_to_write = _create_byte_pattern(val, hex_string=hex_string, flip_endian=flip_endian)
 
     if len(bytes_to_write) < n:
         bytes_to_write = bytes_to_write + [0] * (n - len(bytes_to_write))
@@ -380,7 +376,7 @@ def write_double(target=None, memory_address=None, val=None, big_endian=False, n
     if n > len(fval):
         fval += pack_double(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_double), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_float(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_float, memory_address)
@@ -395,7 +391,7 @@ def write_float(target=None, memory_address=None, val=None, big_endian=False, n=
     if n > len(fval):
         fval += pack_float(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_float), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_int(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_int, memory_address)
@@ -410,7 +406,7 @@ def write_int(target=None, memory_address=None, val=None, big_endian=False, n=1,
     if n > len(fval):
         fval += pack_int(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_int), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_long(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_long, memory_address)
@@ -425,7 +421,7 @@ def write_long(target=None, memory_address=None, val=None, big_endian=False, n=1
     if n > len(fval):
         fval += pack_long(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_long), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_longlong(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_longlong, memory_address)
@@ -440,7 +436,7 @@ def write_longlong(target=None, memory_address=None, val=None, big_endian=False,
     if n > len(fval):
         fval += pack_longlong(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_longlong), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_short(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_short, memory_address)
@@ -455,7 +451,7 @@ def write_short(target=None, memory_address=None, val=None, big_endian=False, n=
     if n > len(fval):
         fval += pack_short(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_short), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def read_ushort(target=None, memory_address=None, big_endian=False, n=1, **kwargs):
     if memory_address == None:
@@ -515,7 +511,7 @@ def write_ushort(target=None, memory_address=None, val=None, big_endian=False, n
     if n > len(fval):
         fval += pack_ushort(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_ushort), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_uint(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_uint, memory_address)
@@ -530,7 +526,7 @@ def write_uint(target=None, memory_address=None, val=None, big_endian=False, n=1
     if n > len(fval):
         fval += pack_uint(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_uint), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_ulong(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_ulong, memory_address)
@@ -545,7 +541,7 @@ def write_ulong(target=None, memory_address=None, val=None, big_endian=False, n=
     if n > len(fval):
         fval += pack_ulong(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_ulong), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 def write_ulonglong(target=None, memory_address=None, val=None, big_endian=False, n=1, **kwargs):
     _validate_input(val, ctypes.c_ulonglong, memory_address)
@@ -560,7 +556,7 @@ def write_ulonglong(target=None, memory_address=None, val=None, big_endian=False
     if n > len(fval):
         fval += pack_ulonglong(0, big_endian=big_endian) * (n - len(fval))
 
-    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval) * ctypes.sizeof(ctypes.c_ulonglong), fval)
+    return _PyMym.writeBytes(__final_target(**kwargs), memory_address, len(fval), fval)
 
 class MemoryProxy:
     def __init__(self, wrapper, data_type):
@@ -593,9 +589,13 @@ class MemoryProxy:
 
             return self.wrapper.write_datatype(memory_address=start, data_type=self.data_type, val=val, n=(stop - start))
         else:
-            if abs(val) > _constraint_map[self.data_type]:
-                raise OverflowError(f"{val} cannot be represented within {self.data_type}")
-            return self.wrapper.write_datatype(memory_address=key, data_type=self.data_type, val=val)
+            fval = val
+            if not isinstance(val, list):
+                fval = [val]
+            for i in fval:
+                if abs(i) > _constraint_map[self.data_type]:
+                    raise OverflowError(f"{i} cannot be represented within {self.data_type}")
+            return self.wrapper.write_datatype(memory_address=key, data_type=self.data_type, val=fval)
 
 class ProcessWrapper():
     def __init__(self, target=None, big_endian=False, **kwargs):
@@ -630,7 +630,10 @@ class ProcessWrapper():
     def __enter__(self):
         return self
 
-    def __exit__(self):
+    def __exit__(self, exception_type, exception_val, exception_trace):
+        if exception_type:
+            print(f"An exception occurred: {exception_val}")
+            print(f"Traceback: {exception_trace}")
         self.close()
 
     def __delete__(self):
@@ -676,7 +679,7 @@ class ProcessWrapper():
 
     def close(self):
         if self.__handle:
-            _PyMym.closeHandle(self.__handle)
+            _PyMym.closeProcess(self.__handle)
             self.__handle = None
             self.__pid = None
             self.__application_name = None
@@ -686,6 +689,9 @@ class ProcessWrapper():
             self.__big_endian = True
         else:
             self.__big_endian = False
+
+    def get_endian(self):
+        return "big" if self.__big_endian else "little"
 
     def read_datatype(self, memory_address, data_type, n=1):
         r = None
@@ -699,7 +705,7 @@ class ProcessWrapper():
             case ctypes.c_short:
                 r = self.read_short(memory_address, n)
             case ctypes.c_int:
-                r = self.read_integer(memory_address, n)
+                r = self.read_int(memory_address, n)
             case ctypes.c_long:
                 r = self.read_long(memory_address, n)
             case ctypes.c_longlong:
@@ -707,7 +713,7 @@ class ProcessWrapper():
             case ctypes.c_ushort:
                 r = self.read_ushort(memory_address, n)
             case ctypes.c_uint:
-                r = self.read_uinteger(memory_address, n)
+                r = self.read_uint(memory_address, n)
             case ctypes.c_ulong:
                 r = self.read_ulong(memory_address, n)
             case ctypes.c_ulonglong:
@@ -728,7 +734,7 @@ class ProcessWrapper():
             case ctypes.c_short:
                 r = self.write_short(memory_address, val, n)
             case ctypes.c_int:
-                r = self.write_integer(memory_address, val, n)
+                r = self.write_int(memory_address, val, n)
             case ctypes.c_long:
                 r = self.write_long(memory_address, val, n)
             case ctypes.c_longlong:
@@ -736,7 +742,7 @@ class ProcessWrapper():
             case ctypes.c_ushort:
                 r = self.write_ushort(memory_address, val, n)
             case ctypes.c_uint:
-                r = self.write_uinteger(memory_address, val, n)
+                r = self.write_uint(memory_address, val, n)
             case ctypes.c_ulong:
                 r = self.write_ulong(memory_address, val, n)
             case ctypes.c_ulonglong:
@@ -892,7 +898,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_float(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_float), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_double(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_double, memory_address)
@@ -907,7 +913,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_double(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_double), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_short(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_short, memory_address)
@@ -922,7 +928,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_short(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_short), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_int(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_int, memory_address)
@@ -937,7 +943,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_int(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_int), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_long(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_long, memory_address)
@@ -952,7 +958,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_long(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_long), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_longlong(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_longlong, memory_address)
@@ -967,7 +973,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_longlong(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_longlong), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_uint(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_uint, memory_address)
@@ -982,7 +988,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_uint(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_uint), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_ushort(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_ushort, memory_address)
@@ -997,7 +1003,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_ushort(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_ushort), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_ulong(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_ulong, memory_address)
@@ -1012,7 +1018,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_ulong(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_ulong), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def write_ulonglong(self, memory_address=None, val=None, n=1):
         _validate_input(val, ctypes.c_ulonglong, memory_address)
@@ -1027,7 +1033,7 @@ class ProcessWrapper():
         if n > len(fval):
             fval += pack_ulonglong(0, big_endian=self.__big_endian) * (n - len(fval))
 
-        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval) * ctypes.sizeof(ctypes.c_ulonglong), fval)
+        return _PyMym.handledWriteBytes(self.__handle, memory_address, len(fval), fval)
 
     def module_aob_scan(self, module_name=None, pattern=None, mask=None, offset=0, result_instance=0, hex_string=False, flip_endian=False):
         if None in [module_name, pattern]:

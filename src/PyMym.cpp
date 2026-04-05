@@ -167,11 +167,11 @@ std::vector<std::string> getModules(unsigned long pid) {
     HANDLE hnProcess = OpenProcess(PROCESS_ALL_ACCESS, false, processID);
     intptr_t hProcess = reinterpret_cast<intptr_t>(hnProcess);
 
-    if (!hProcess) {
+    if (!hnProcess) {
         return ret;
     }
 
-    handledGetModules(hProcess);
+    ret = handledGetModules(hProcess);
 
     CloseHandle(hnProcess);
 
