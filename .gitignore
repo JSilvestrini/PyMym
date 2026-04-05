@@ -4,3 +4,5 @@ build
 dist
 PyMym.egg-info
 .vscode
+out
+test.py
