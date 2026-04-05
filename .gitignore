@@ -7,3 +7,6 @@ PyMym.egg-info
 out
 test.py
 tests/__pycache__
+PyMym/__pycache__
+PyMym/*.pyd
+.pytest_cache
