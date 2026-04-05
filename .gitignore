@@ -8,3 +8,4 @@ out
 test.py
 PyMym/*.pyd
 PyMym/__pycache__
+tests/__pycache__
