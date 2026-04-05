@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        "PyMym": ["*.pyd", "*.pyc", "*.pyi", "*.py"],
+        "PyMym": ["*.pyd", "*.pyi", "*.py"],
     },
     version='1.0.0',
     description='A Python library for memory manipulation in Windows',
@@ -15,7 +15,4 @@ setup(
     author='Julian Silvestrini',
     url="https://github.com/JSilvestrini/PyMym",
     install_requires=['pywin32'],
-    #setup_requires=['pytest-runner'],
-    #tests_require=['pytest'],
-    #test_suite='tests',
 )

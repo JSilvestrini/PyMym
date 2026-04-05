@@ -5,6 +5,7 @@ import ctypes
 import subprocess
 import time
 import math
+import pytest
 
 def test_get_pid():
     assert pm.get_pid("python.exe") == os.getpid()
@@ -30,7 +31,7 @@ def test_aob_scan():
 
     assert (bytes(read_bytes)) == bytes(base_string, "utf-8")
 
-    proc = subprocess.Popen(["./c_test.exe"], text=True, stdout= subprocess.PIPE)
+    proc = subprocess.Popen(["./tests/c_test.exe"], text=True, stdout= subprocess.PIPE)
     time.sleep(2)
 
     pid = proc.pid
@@ -313,7 +314,7 @@ def test_process_wrapper():
 
     assert (bytes(read_bytes)) == bytes(base_string, "utf-8")
 
-    proc = subprocess.Popen(["./c_test.exe"], text=True, stdout= subprocess.PIPE)
+    proc = subprocess.Popen(["./tests/c_test.exe"], text=True, stdout= subprocess.PIPE)
     time.sleep(2)
 
     with pm.ProcessWrapper(pid=proc.pid) as pw2:

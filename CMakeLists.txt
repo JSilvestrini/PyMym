@@ -24,13 +24,8 @@ pybind11_add_module(PyMym SHARED src/PyMym.cpp)
 
 set_target_properties(PyMym PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON)
 
-set(INIT_PY "${CMAKE_CURRENT_BINARY_DIR}/__init__.py")
-if(NOT EXISTS ${INIT_PY})
-file(WRITE ${INIT_PY} "")
-endif()
-
 add_custom_command(TARGET PyMym POST_BUILD
 COMMAND ${CMAKE_COMMAND} -E copy
 $<TARGET_FILE_DIR:PyMym>/$<TARGET_FILE_NAME:PyMym>
-${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_NAME:PyMym>
+${CMAKE_SOURCE_DIR}/PyMym/$<TARGET_FILE_NAME:PyMym>
 )
