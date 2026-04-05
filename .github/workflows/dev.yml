@@ -29,6 +29,9 @@ jobs:
                   cmake --build build -j
                   ./PyMym-Memr/Scripts/python -m pip install .
 
+            - name: Force Installed Version
+              run: rename PyMym PyMym_src
+
             - name: Run Tests
               run: ./PyMym-Memr/Scripts/pytest
 
