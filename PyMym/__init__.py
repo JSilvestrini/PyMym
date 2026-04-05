@@ -1,4 +1,4 @@
-from . import PyMym as _PyMym
+from . import src_PyMym as _PyMym
 
 import ctypes
 import struct
