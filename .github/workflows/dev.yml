@@ -36,7 +36,7 @@ jobs:
               if: success()
               uses: peter-evans/create-pull-request@v6
               with:
-                  token: ${{ secrets.GITHUB_PYMYM_API_TOKEN }}
+                  token: ${{ secrets.PYMYM_REPO_API_TOKEN }}
                   branch: dev
                   base: main
                   title: 'CI: Auto-PR from Dev (Tests Passed)'
