@@ -30,5 +30,9 @@ if __name__ == "__main__":
     pw.ulonglong[addr:addr+12] = [0xBEEFDEADFEEDCAFE, 0xFEEFDEEDCFEEA333]
     print([hex(0xBEEFDEADFEEDCAFE), hex(0xFEEFDEEDCFEEA333)])
     print([hex(x) for x in pw.ulonglong[addr:addr+12]])
+    pw.ulonglong[addr] = [0xBEEF00000000CAFE]
+    print(pw.ulonglong[addr:addr+2])
+
+    print(type([0xBEEF00000000CAFE]))
 
     proc.terminate()

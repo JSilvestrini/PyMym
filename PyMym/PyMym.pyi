@@ -24,23 +24,19 @@ allowed_data_types = Literal[
 
 @overload
 def module_aob_scan(pid: typing.SupportsInt, module_name: str = None, pattern: pattern_type = None, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
-    """
-    Searches memory within the given module of a process.\n
-    Takes a byte pattern and returns the location of the byte pattern if found, otherwise 0.\n
-    Takes an optional mask, offset, result instance, and two booleans for hex string and flip endian.\n
-    The mask is a string that is the same length as the byte pattern 'x' is an exact match and '?' is a wildcard.\n
-    Offset will add the number of bytes to the final result. Instance is the n + 1 instance of the pattern, so 0 is the first instance and 1 is the second.\n\n
-
-    Example of argumets for a pattern search:\n
+    """Scans the given module of the process for the given pattern.\n
+    Can take an optional 'mask', with ? as a wildcard and x as a required byte\n
+    'offset' is added to the result and 'result_instance' is the n+1 instance of the pattern\n
+    'flip_endian' will flip the pattern if used, 'hex_string' should be set to True if the pattern is a string of bytes\n
+    
     ```python
-    byte_pattern = [0x48, 0x8B, 0x00, 0x48]
-    byte_pattern = "48 8b 00 48" # set hex_string=True
-    byte_pattern = b"SCAN" # keep hex_string=False (default)
-    byte_pattern = pack_int(145, big_endian=False)
-    mask = "xx?x"
-    offset = 3
-
+    module = get_modules(pid=pid)[0]
+    addr = module_aob_scan(pid=pid, module_name=module, pattern="AA BB CC", mask="x?x", hex_string=True) # ? is a wildcard
+    addr2 = module_aob_scan(application_name=name, module_name=module, pattern="Hello, World") # 'mask' will default to no wildcards
+    sval = pack_int(val=522, big_endian=False) # 'big_endian' is False by default
+    addr3 = module_aob_scan(pid=pid, module_name=module, pattern=sval)
     ```
+
     """
 @overload
 def module_aob_scan(application_name: str, module_name: str = None, pattern: pattern_type = None, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
@@ -62,42 +58,36 @@ def get_process_names() -> list[str]:
 @overload
 def heap_aob_scan(pid: typing.SupportsInt, pattern: pattern_type = None, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
     """
-    Searches within the heap memory of the given process.\n
-    Takes a byte pattern and returns the location in memory of the byte pattern if found, otherwise 0.\n
-    Takes an optional mask, offset, result instance, and two booleans for hex string and flip endian. The mask is a string that is the same length as the byte pattern
-    'x' is an exact match and '?' is a wildcard.\n
-    Offset will add the number of bytes to the final result. Instance is the n + 1 instance of the pattern, so 0 is the first instance and 1 is the second.\n\n
-
-    Example of argumets for a pattern search:\n
+    Scans the heap of the process for the given pattern.\n
+    Can take an optional 'mask', with ? as a wildcard and x as a required byte\n
+    'offset' is added to the result and 'result_instance' is the n+1 instance of the pattern\n
+    'flip_endian' will flip the pattern if used, 'hex_string' should be set to True if the pattern is a string of bytes\n
+    
     ```python
-    byte_pattern = [0x48, 0x8B, 0x00, 0x48]
-    byte_pattern = "48 8b 00 48" # set hex_string=True
-    byte_pattern = b"SCAN" # keep hex_string=False (default)
-    mask = "xx?x"
-    offset = 3
-
+    addr = heap_aob_scan(pid=pid, pattern="AA BB CC", mask="x?x", hex_string=True)
+    addr2 = heap_aob_scan(application_name=name, pattern="Hello, World")
+    sval = pack_int(val=522, big_endian=False)
+    addr3 = heap_aob_scan(pid=pid, pattern=sval)
     ```
+
     """
 @overload
 def heap_aob_scan(application_name: str, pattern: pattern_type = None, mask: str = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int: ...
 @overload
 def stack_aob_scan(pid: typing.SupportsInt, pattern: pattern_type = None, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int:
     """
-    Searches within the stack memory of the given process.\n
-    Takes a byte pattern and returns the location in memory of the byte pattern if found, otherwise 0.\n
-    Takes an optional mask, offset, result instance, and two booleans for hex string and flip endian. The mask is a string that is the same length as the byte pattern
-    'x' is an exact match and '?' is a wildcard.\n
-    Offset will add the number of bytes to the final result. Instance is the n + 1 instance of the pattern, so 0 is the first instance and 1 is the second.\n\n
-
-    Example of argumets for a pattern search:\n
+    Scans the stack of the process for the given pattern.\n
+    Can take an optional 'mask', with ? as a wildcard and x as a required byte\n
+    'offset' is added to the result and 'result_instance' is the n+1 instance of the pattern\n
+    'flip_endian' will flip the pattern if used, 'hex_string' should be set to True if the pattern is a string of bytes\n
+    
     ```python
-    byte_pattern = [0x48, 0x8B, 0x00, 0x48]
-    byte_pattern = "48 8b 00 48" # set hex_string=True
-    byte_pattern = b"SCAN" # keep hex_string=False (default)
-    mask = "xx?x"
-    offset = 3
-
+    addr = stack_aob_scan(pid=pid, pattern="AA BB CC", mask="x?x", hex_string=True)
+    addr2 = stack_aob_scan(application_name=name, pattern="Hello, World")
+    sval = pack_int(val=522, big_endian=False)
+    addr3 = stack_aob_scan(pid=pid, pattern=sval)
     ```
+
     """
 @overload
 def stack_aob_scan(application_name: str, pattern: pattern_type = None, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int: ...
@@ -412,7 +402,7 @@ class ProcessWrapper:
     def read_ulonglong(self, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1) -> int:
         """Reads 'n' unsigned long longs at the given 'memory_address', returns a list of unsigned long longs regardless 'n'"""
 
-    def write_bytes(self, memory_address: typing.SupportsInt = None, val: pattern_type = None, n: typing.SupportsInt = 1, overwrite_endian: bool = False) -> bool:
+    def write_bytes(self, memory_address: typing.SupportsInt = None, val: pattern_type = None, n: typing.SupportsInt = 1, overwrite_endian: bool = False, hex_string: bool = False) -> bool:
         """writes 'val' at given 'memory_address', if 'n' is greater than 'val' in byte form, then 0's fill in the remaining bytes"""
 
     def write_float(self, memory_address: typing.SupportsInt = None, val: typing.SupportsFloat = None, n: typing.SupportsInt = 1) -> bool:
@@ -446,7 +436,7 @@ class ProcessWrapper:
         """writes 'val' at given 'memory_address', if 'n' is greater than len(val), then 0's fill the remaining unsigned long longs"""
 
     def module_aob_scan(self, module_name: str = None, pattern: pattern_type = None, mask: str = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False):
-        """Scans the stack of the process for the given pattern.\n
+        """Scans the given module of the process for the given pattern.\n
         Can take an optional 'mask', with ? as a wildcard and x as a required byte\n
         'offset' is added to the result and 'result_instance' is the n+1 instance of the pattern\n
         'flip_endian' will flip the pattern if used, 'hex_string' should be set to True if the pattern is a string of bytes\n
