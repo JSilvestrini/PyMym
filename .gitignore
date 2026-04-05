@@ -6,3 +6,5 @@ PyMym.egg-info
 .vscode
 out
 test.py
+PyMym/*.pyd
+PyMym/__pycache__
