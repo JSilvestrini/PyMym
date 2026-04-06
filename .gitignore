@@ -6,6 +6,9 @@ PyMym.egg-info
 .vscode
 out
 test.py
-PyMym/*.pyd
-PyMym/__pycache__
 tests/__pycache__
+PyMym/__pycache__
+src/PyMym/*.pyd
+.pytest_cache
+__pycache__
+src/PyMym/backend/_lib*

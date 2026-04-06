@@ -13,18 +13,19 @@
 ## Table of Contents
 
 - [Features](#features)
+- [How to Use](#how-to-use)
     - [Memory Scanning](#memory-scanning)
     - [Memory Reading](#memory-reading)
     - [Memory Manipulation](#memory-manipulation)
     - [Process Wrapping](#process-wrapping)
-- [How to Use](#how-to-use)
-- [Performance Score](#pagespeed-insights-performance-score)
 - [Contributing](#contributing)
 - [License](#license)
 
 <br>
 
 ## Features
+
+## How to Use
 
 ### Memory Scanning
 
@@ -33,3 +34,7 @@
 ### Memory Manipulation
 
 ### Process Wrapping
+
+## Contributing
+
+## License

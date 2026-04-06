@@ -650,7 +650,7 @@ bool closeProcess(intptr_t hProcess) {
     return CloseHandle(hnProcess);
 }
 
-PYBIND11_MODULE(PyMym, m) {
+PYBIND11_MODULE(_lib, m) {
     m.def("moduleAOBScan", (intptr_t (*)(unsigned long, const char*, const std::vector<uint8_t>&, const char*, intptr_t, intptr_t)) &moduleAOBScan, 
         py::arg("pid"), py::arg("module_name"), py::arg("pattern"), py::arg("mask"), py::arg("offset") = 0, py::arg("result_instance") = 0);
     m.def("readBytes",(std::vector<unsigned char> (*)(unsigned long, intptr_t, int)) &readBytes,

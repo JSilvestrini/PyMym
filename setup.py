@@ -3,10 +3,11 @@ from setuptools import find_packages, setup
 #put required libraries here
 setup(
     name='PyMym',
-    packages=find_packages(),
+    package_dir={"": "src"},
+    packages=find_packages(where="src", include=["PyMym"]),
     include_package_data=True,
     package_data={
-        "PyMym": ["*.pyd", "*.pyc", "*.pyi", "*.py"],
+        "PyMym": ["backend/*.pyd", "*.pyi"],
     },
     version='1.0.0',
     description='A Python library for memory manipulation in Windows',
@@ -15,7 +16,4 @@ setup(
     author='Julian Silvestrini',
     url="https://github.com/JSilvestrini/PyMym",
     install_requires=['pywin32'],
-    #setup_requires=['pytest-runner'],
-    #tests_require=['pytest'],
-    #test_suite='tests',
 )

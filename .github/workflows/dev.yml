@@ -1,0 +1,51 @@
+name: Build and Test
+
+on:
+    push:
+        branches: ['dev']
+
+jobs:
+    dev-test:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python 3.14
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.14-dev'
+                  allow-prereleases: true
+
+            - name: Create Venv for CMake
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+                  pip install pytest setuptools wheel build
+
+            - name: Attempt to Remove Artifacts
+              run: |
+                  if (Test-Path "build") { Remove-Item -Recurse -Force build }
+                  if (Test-Path "src/PyMym.egg-info") { Remove-Item -Recurse -Force src/PyMym.egg-info }
+
+            - name: Build C++ Extension
+              run: |
+                  cmake -S. build -Ax64
+                  cmake --build build -j
+                  python setup.py sdist bdist_wheel
+                  pip install .
+
+            - name: Force Installed Version
+              run: Remove-Item -Path "./src" -Recurse -Force
+
+            - name: Run Tests
+              run: pytest
+
+            - name: Create Pull Request to Main
+              if: success()
+              uses: peter-evans/create-pull-request@v6
+              with:
+                  token: ${{ secrets.PYMYM_REPO_ACCESS_TOKEN }}
+                  branch: dev
+                  base: main
+                  title: 'CI: Auto-PR from Dev (Tests Passed)'
+                  body: 'Automated PR triggered by successful build and test on 3.14.'
