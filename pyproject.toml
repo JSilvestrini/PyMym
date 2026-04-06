@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyMym"
-version = "1.0.1"
+version = "1.0.2"
 description = "A Python library for memory manipulation in Windows"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [
+author = [
     {name = "Julian Silvestrini", email = "juliansilvestrini@gmail.com"}
 ]
 classifiers = [
@@ -32,6 +32,7 @@ dependencies = [
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+zip-safe = false
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -39,3 +40,6 @@ include = ["PyMym*"]
 
 [tool.setuptools.package-data]
 "PyMym" = ["backend/*.pyd", "*.pyi"]
+
+[tool.distutils.bdist_wheel]
+universal = false
