@@ -48,4 +48,3 @@ include = ["PyMym*"]
 
 [tool.distutils.bdist_wheel]
 universal = false
-plat_name = win_amd64
