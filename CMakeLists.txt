@@ -6,13 +6,13 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 execute_process(
     COMMAND "${Python3_EXECUTABLE}" -m pybind11 --cmakedir
     OUTPUT_VARIABLE pybind11_DIR
-    RESULT_VARIABLE pybind11_FIND_RESULT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 set(pybind11_DIR ${pybind11_DIR})
 
 message(STATUS "Using pybind11 found at: ${pybind11_DIR}")
-find_package(pybind11 REQUIRED)
+find_package(pybind11 CONFIG REQUIRED PATHS "${pybind11_DIR}" NO_DEFAULT_PATH)
 
 pybind11_add_module(_lib SHARED src/cpp/src_PyMym.cpp)
 
