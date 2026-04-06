@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from . import src_PyMym as _PyMym
+
 import ctypes
 import struct
 import inspect
