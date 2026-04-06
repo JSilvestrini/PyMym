@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from .backend import _lib
+try:
+    from PyMym.backend import _lib
+except ImportError:
+    from .backend import _lib
 
 import ctypes
 import struct

@@ -23,6 +23,11 @@ jobs:
                   ./PyMym-Memr/Scripts/pip install -r requirements.txt
                   ./PyMym-Memr/Scripts/pip install pytest setuptools wheel build
 
+            - name: Attempt to Remove Artifacts
+              run: |
+                  if (Test-Path "build") { Remove-Item -Recurse -Force build }
+                  if (Test-Path "src/PyMym.egg-info") { Remove-Item -Recurse -Force src/PyMym.egg-info }
+
             - name: Build C++ Extension
               run: |
                   cmake -S. build -Ax64
