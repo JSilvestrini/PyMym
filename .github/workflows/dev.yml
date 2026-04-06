@@ -18,10 +18,9 @@ jobs:
 
             - name: Create Venv for CMake
               run: |
-                  python -m venv PyMym-Memr
-                  ./PyMym-Memr/Scripts/python -m pip install --upgrade pip
-                  ./PyMym-Memr/Scripts/pip install -r requirements.txt
-                  ./PyMym-Memr/Scripts/pip install pytest setuptools wheel build
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+                  pip install pytest setuptools wheel build
 
             - name: Attempt to Remove Artifacts
               run: |
@@ -32,14 +31,14 @@ jobs:
               run: |
                   cmake -S. build -Ax64
                   cmake --build build -j
-                  ./PyMym-Memr/Scripts/python setup.py sdist bdist_wheel
-                  ./PyMym-Memr/Scripts/pip install .
+                  python setup.py sdist bdist_wheel
+                  pip install .
 
             - name: Force Installed Version
               run: Remove-Item -Path "./src" -Recurse -Force
 
             - name: Run Tests
-              run: ./PyMym-Memr/Scripts/pytest
+              run: pytest
 
             - name: Create Pull Request to Main
               if: success()
