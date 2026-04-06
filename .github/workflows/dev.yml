@@ -53,6 +53,8 @@ jobs:
                   title: 'CI: Auto-PR from Dev (All Matrix Tests Passed)'
                   body: |
                       Automated PR triggered by successful builds and tests on:
+                      - Python 3.10
+                      - Python 3.11
                       - Python 3.12
                       - Python 3.13
                       - Python 3.14
