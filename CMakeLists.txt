@@ -20,12 +20,12 @@ set(pybind11_DIR ${pybind11_cmake_dir})
 message(STATUS "Using pybind11 found at: ${pybind11_DIR}")
 find_package(pybind11 REQUIRED)
 
-pybind11_add_module(src_PyMym SHARED src/src_PyMym.cpp)
+pybind11_add_module(src_PyMym SHARED src/cpp/src_PyMym.cpp)
 
 set_target_properties(src_PyMym PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON)
 
 add_custom_command(TARGET src_PyMym POST_BUILD
 COMMAND ${CMAKE_COMMAND} -E copy
 $<TARGET_FILE_DIR:src_PyMym>/$<TARGET_FILE_NAME:src_PyMym>
-${CMAKE_SOURCE_DIR}/PyMym/$<TARGET_FILE_NAME:src_PyMym>
+${CMAKE_SOURCE_DIR}/src/PyMym/$<TARGET_FILE_NAME:src_PyMym>
 )
