@@ -42,7 +42,7 @@ __all__ = [
     "read_uint",
     "read_ulong",
     "read_ulonglong",
-    "write_bytes"
+    "write_bytes",
     "write_float",
     "write_double",
     "write_short",
@@ -61,6 +61,7 @@ __all__ = [
     "module_aob_scan",
     "heap_aob_scan",
     "stack_aob_scan",
+    "_create_byte_pattern",
 ]
 
 def __check_constraint(data_type, signed=True):

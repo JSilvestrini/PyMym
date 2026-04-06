@@ -26,7 +26,13 @@ def test_aob_scan():
     pid = os.getpid()
     base_string = "This string is within the AOBScan testing function!"
     pattern = [int(hex(ord(x)), 16) for x in base_string]
-    address = pm.heap_aob_scan(pid=pid, pattern=pattern, result_instance=1)
+    address = pm.heap_aob_scan(pid=pid, pattern=pattern, result_instance=0)
+    c = 1
+
+    while address == 0:
+        address = pm.heap_aob_scan(pid=pid, pattern=pattern, result_instance=c)
+        c += 1
+
     read_bytes = pm.read_bytes(pid=pid, memory_address=address, n=len(base_string))
 
     assert (bytes(read_bytes)) == bytes(base_string, "utf-8")
