@@ -10,10 +10,18 @@ import struct
 import inspect
 
 # TODO: Reduce the code for the memory scan, make a helper function that performs the search so all 3 scans can use it
-# TODO: Add in tests for the new class
 # TODO: Add in support for wide characters/ UTF-16
-
-# TODO: Update all descriptions in PyMym.pyi and make sure they match the functions
+# TODO: Add in get_module_address, get address of specified module
+# TODO: Add in get_main_thread_id, gets main thread id of process
+# TODO: Add in get_thread_ids, gets list of threads for process
+# TODO: Add in char & uchar support
+# TODO: Raise exceptions, make custom exceptions
+# TODO: Add in get_process_base_module, returns base module
+# TODO: Add in ProcessWrapper.get_address, returns address of process
+# TODO: Think about QoL features
+# TODO: Tons and Tons of validation
+# TODO: Rework tests so that each individual function has its own testing function
+# TODO: Create search functions that return all addresses of found values
 
 __all__ = [
     "ProcessWrapper",
@@ -408,14 +416,14 @@ def read_short(target=None, memory_address=None, big_endian=False, n=1, **kwargs
         ret.append(unpack_short(val[i * ctypes.sizeof(ctypes.c_short) : (i + 1) * ctypes.sizeof(ctypes.c_short)], big_endian=big_endian))
     return ret if len(ret) > 1 else ret[0]
 
-def write_bytes(target=None, memory_address=None, val=None, hex_string=False, flip_endian=False, n=1, **kwargs):
+def write_bytes(target=None, memory_address=None, val=None, hex_string=False, n=1, **kwargs):
     if val == None:
         raise TypeError
 
     if memory_address == None:
         raise TypeError
 
-    bytes_to_write = _create_byte_pattern(val, hex_string=hex_string, flip_endian=flip_endian)
+    bytes_to_write = _create_byte_pattern(val, hex_string=hex_string)
 
     if len(bytes_to_write) < n:
         bytes_to_write = bytes_to_write + [0] * (n - len(bytes_to_write))
@@ -935,9 +943,7 @@ class ProcessWrapper():
         if memory_address == None:
             raise TypeError
 
-        endian = self.__big_endian if not overwrite_endian else not self.__big_endian
-
-        bytes_to_write = _create_byte_pattern(val, hex_string=hex_string, flip_endian=endian)
+        bytes_to_write = _create_byte_pattern(val, hex_string=hex_string)
 
         if len(bytes_to_write) < n:
             bytes_to_write = bytes_to_write + [0] * (n - len(bytes_to_write))

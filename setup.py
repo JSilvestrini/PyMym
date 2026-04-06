@@ -14,6 +14,9 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author='Julian Silvestrini',
-    url="https://github.com/JSilvestrini/PyMym",
+    project_urls={
+        "Documentation": "https://github.com/JSilvestrini/PyMym/blob/main/README.md",
+        "Source": "https://github.com/JSilvestrini/PyMym",
+    },
     install_requires=['pywin32'],
 )

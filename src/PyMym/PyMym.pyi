@@ -92,10 +92,10 @@ def stack_aob_scan(pid: typing.SupportsInt, pattern: pattern_type = None, mask: 
 @overload
 def stack_aob_scan(application_name: str, pattern: pattern_type = None, mask: str  = None, offset: typing.SupportsInt = 0, result_instance: typing.SupportsInt = 0, flip_endian: bool = False, hex_string: bool = False) -> int: ...
 @overload
-def read_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, flip_endian: bool = False) -> int | list[int]:
+def read_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1) -> int | list[int]:
     """Returns the n bytes at the given address in a process"""
 @overload
-def read_bytes(application_name: str, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, flip_endian: bool = False) -> int | list[int]:
+def read_bytes(application_name: str, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1) -> int | list[int]:
     """"""
 @overload
 def read_double(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> float | list[float]:
@@ -134,7 +134,7 @@ def read_short(pid: typing.SupportsInt, memory_address: typing.SupportsInt = Non
 def read_short(application_name: str, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """"""
 @overload
-def write_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, val: pattern_type = None, hex_string: bool = False, flip_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
+def write_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, val: pattern_type = None, hex_string: bool = False, n: typing.SupportsInt = 1) -> bool:
     """
     Writes a sequence of bytes to a given location in a process, returns true if the operation succeeded.\n
     Example:
@@ -151,7 +151,7 @@ def write_bytes(pid: typing.SupportsInt, memory_address: typing.SupportsInt = No
     ```
     """
 @overload
-def write_bytes(application_name: str, memory_address: typing.SupportsInt = None, val: pattern_type = None, hex_string: bool = False, flip_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
+def write_bytes(application_name: str, memory_address: typing.SupportsInt = None, val: pattern_type = None, hex_string: bool = False, n: typing.SupportsInt = 1) -> bool:
     """"""
 @overload
 def write_double(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, val: typing.SupportsFloat | list[typing.SupportsFloat] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
@@ -189,52 +189,52 @@ def write_short(pid: typing.SupportsInt, memory_address: typing.SupportsInt = No
 @overload
 def write_short(application_name: str, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """"""
-
+@overload
 def read_ushort(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """Reads an unsigned short from the given location in a process."""
-
-def read_ushort(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
+@overload
+def read_ushort(application_name: str, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """"""
-
+@overload
 def read_uint(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """Reads an unsigned integer from the given location in a process."""
-
-def read_uint(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
+@overload
+def read_uint(application_name: str, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """"""
-
+@overload
 def read_ulong(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """Reads an unsigned long from the given location in a process."""
-
-def read_ulong(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
+@overload
+def read_ulong(application_name: str, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """"""
-
+@overload
 def read_ulonglong(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """Reads an unsigned long long from the given location in a process."""
-
-def read_ulonglong(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
+@overload
+def read_ulonglong(application_name: str, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1, big_endian: bool = False) -> int | list[int]:
     """"""
-
+@overload
 def write_ushort(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """Writes an unsigned short to a given location in a process, returns true if the operation succeeded."""
-
+@overload
 def write_ushort(application_name: str, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """"""
-
+@overload
 def write_uint(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """Writes an unsigned integer to a given location in a process, returns true if the operation succeeded."""
-
+@overload
 def write_uint(application_name: str, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """"""
-
+@overload
 def write_ulong(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """Writes an unsigned long to a given location in a process, returns true if the operation succeeded."""
-
+@overload
 def write_ulong(application_name: str, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """"""
-
+@overload
 def write_ulonglong(pid: typing.SupportsInt, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """Writes an unsigned long long to a given location in a process, returns true if the operation succeeded."""
-
+@overload
 def write_ulonglong(application_name: str, memory_address: typing.SupportsInt = None, val: typing.SupportsInt | list[typing.SupportsInt] = None, big_endian: bool = False, n: typing.SupportsInt = 1) -> bool:
     """"""
 
@@ -408,7 +408,7 @@ class ProcessWrapper:
     def read_ulonglong(self, memory_address: typing.SupportsInt = None, n: typing.SupportsInt = 1) -> int | list[int]:
         """Reads 'n' unsigned long longs at the given 'memory_address', returns a list of unsigned long longs regardless 'n'"""
 
-    def write_bytes(self, memory_address: typing.SupportsInt = None, val: pattern_type = None, n: typing.SupportsInt = 1, overwrite_endian: bool = False, hex_string: bool = False) -> bool:
+    def write_bytes(self, memory_address: typing.SupportsInt = None, val: pattern_type = None, n: typing.SupportsInt = 1, hex_string: bool = False) -> bool:
         """Writes a sequence of bytes to a given location in a process, returns true if the operation succeeded.\n
         Example:
         ```python
