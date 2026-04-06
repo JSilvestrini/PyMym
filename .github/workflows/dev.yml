@@ -48,7 +48,7 @@ jobs:
               uses: peter-evans/create-pull-request@v6
               with:
                   token: ${{ secrets.PYMYM_REPO_ACCESS_TOKEN }}
-                  branch: dev
+                  branch: temp-dev
                   base: main
                   title: 'CI: Auto-PR from Dev (All Matrix Tests Passed)'
                   body: |
