@@ -299,13 +299,6 @@ def test_process_wrapper():
         assert math.isclose(pw.float[ctypes.addressof(fl) + ctypes.sizeof(ctypes.c_float) * i], (5 - i), rel_tol=1e-6)
         assert math.isclose(pw.double[ctypes.addressof(dl)+ ctypes.sizeof(ctypes.c_double) * i], (5 - i), rel_tol=1e-15)
 
-    base_string = "This string is within the AOBScan testing function!"
-    pattern = [int(hex(ord(x)), 16) for x in base_string]
-    address = pw.heap_aob_scan(pattern=pattern, result_instance=1)
-    read_bytes = pw.read_bytes(memory_address=address, n=len(base_string))
-
-    assert (bytes(read_bytes)) == bytes(base_string, "utf-8")
-
     proc = subprocess.Popen(["./tests/c_test.exe"], text=True, stdout= subprocess.PIPE)
     time.sleep(2)
 

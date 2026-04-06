@@ -1,10 +1,9 @@
 from __future__ import annotations
-
-from .src_PyMym import *
-
 import ctypes
 import struct
 import inspect
+
+from .src_PyMym import *
 
 # TODO: Reduce the code for the memory scan, make a helper function that performs the search so all 3 scans can use it
 # TODO: Add in tests for the new class
