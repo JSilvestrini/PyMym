@@ -33,7 +33,7 @@ PyMym is a Python memory manipulation library that allows quick and easy memory 
 - **C++ Core Performance**: Native execution for memory-intensive operations, bypassing the overhead of traditional Python wrappers.
 - **Pattern Matching**: High-speed Array of Bytes scanning to find stable hooks in frequently updating applications.
 - **Zero-Config Installation**: Pre-compiled binary wheels for Windows mean no local compiler is required for most users.
-  <!-- - **Memory-Safe Design**: Managed C++ backend handles pointer validation to prevent Python interpreter crashes during invalid reads. Need to do more checks before this can be claimed :( -->
+    <!-- - **Memory-Safe Design**: Managed C++ backend handles pointer validation to prevent Python interpreter crashes during invalid reads. Need to do more checks before this can be claimed :( -->
 - **Flexibility**: Simple Pythonic process wrapping for seamless memory manipulation or stand-alone memory manipulation without needing to use a class
 
 ## How to Use
