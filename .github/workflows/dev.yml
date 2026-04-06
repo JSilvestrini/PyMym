@@ -32,6 +32,10 @@ jobs:
             #- name: Force Installed Version
             #run: Remove-Item -Path "./PyMym" -Recurse -Force
 
+            - name: Verify Installation
+              run: |
+                  ./PyMym-Memr/Scripts/python -c "import PyMym; print(PyMym.__file__); import os; print(os.listdir(os.path.dirname(PyMym.__file__)))"
+
             - name: Run Tests
               run: ./PyMym-Memr/Scripts/pytest
 
