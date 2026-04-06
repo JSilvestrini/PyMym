@@ -702,7 +702,7 @@ class ProcessWrapper():
         return f"{self.__class__.__name__}(application_name={self.__application_name!r}, pid={self.__pid})"
 
     def __str__(self):
-        return f"<{self.__application_name} (PID: {self.__pid}) [{"Open" if self.__handle != None else "Closed"}]>"
+        return f"<{self.__application_name} (PID: {self.__pid}) [{'Open' if self.__handle != None else 'Closed'}]>"
 
     def __bool__(self):
         return self.__handle != None
