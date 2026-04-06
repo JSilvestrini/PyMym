@@ -3,46 +3,58 @@ name: Build and Test
 on:
     push:
         branches: ['dev']
+    pull_request:
+        branches: ['dev']
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
     dev-test:
         runs-on: windows-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ['3.12', '3.13', '3.14']
         steps:
             - uses: actions/checkout@v4
 
-            - name: Set up Python 3.14
+            - name: Set up Python ${{ matrix.python-version }}
               uses: actions/setup-python@v5
               with:
-                  python-version: '3.14-dev'
-                  allow-prereleases: true
+                  python-version: ${{ matrix.python-version }}
 
-            - name: Create Venv for CMake
+            - name: Get Python Ready
               run: |
                   python -m pip install --upgrade pip
-                  pip install -r requirements.txt
-                  pip install pytest setuptools wheel build
-
-            - name: Attempt to Remove Artifacts
-              run: |
-                  if (Test-Path "build") { Remove-Item -Recurse -Force build }
-                  if (Test-Path "src/PyMym.egg-info") { Remove-Item -Recurse -Force src/PyMym.egg-info }
+                  pip install pybind11 pytest setuptools wheel
 
             - name: Build C++ Extension
               run: |
-                  cmake -S. build -Ax64
-                  cmake --build build -j
-                  python setup.py sdist bdist_wheel
+                  $python_path = (Get-Command python).Source
+                  cmake -B build -S . "-DPython3_EXECUTABLE=$python_path"
+                  cmake --build build
                   pip install .
 
             - name: Run Tests
               run: pytest
 
+    create_pr:
+        needs: dev-test
+        runs-on: ubuntu-latest
+        if: success()
+        steps:
+            - uses: actions/checkout@v4
             - name: Create Pull Request to Main
-              if: success()
               uses: peter-evans/create-pull-request@v6
               with:
                   token: ${{ secrets.PYMYM_REPO_ACCESS_TOKEN }}
                   branch: dev
                   base: main
-                  title: 'CI: Auto-PR from Dev (Tests Passed)'
-                  body: 'Automated PR triggered by successful build and test on 3.14.'
+                  title: 'CI: Auto-PR from Dev (All Matrix Tests Passed)'
+                  body: |
+                      Automated PR triggered by successful builds and tests on:
+                      - Python 3.12
+                      - Python 3.13
+                      - Python 3.14

@@ -1,23 +1,18 @@
 cmake_minimum_required(VERSION 3.18)
 project(_lib)
 
-find_package(Python3 3.14 REQUIRED COMPONENTS Interpreter Development REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
 execute_process(
     COMMAND "${Python3_EXECUTABLE}" -m pybind11 --cmakedir
     OUTPUT_VARIABLE pybind11_DIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
-    RESULT_VARIABLE pybind11_FIND_RESULT
 )
-
-if(NOT pybind11_FIND_RESULT EQUAL 0)
-    message(FATAL_ERROR "pybind11 not found via ${Python3_EXECUTABLE}. Did you run pip install pybind11?")
-endif()
 
 set(pybind11_DIR ${pybind11_DIR})
 
 message(STATUS "Using pybind11 found at: ${pybind11_DIR}")
-find_package(pybind11 REQUIRED)
+find_package(pybind11 CONFIG REQUIRED PATHS "${pybind11_DIR}" NO_DEFAULT_PATH)
 
 pybind11_add_module(_lib SHARED src/cpp/src_PyMym.cpp)
 
