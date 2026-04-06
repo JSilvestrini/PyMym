@@ -34,9 +34,6 @@ jobs:
                   python setup.py sdist bdist_wheel
                   pip install .
 
-            - name: Force Installed Version
-              run: Remove-Item -Path "./src" -Recurse -Force
-
             - name: Run Tests
               run: pytest
 
