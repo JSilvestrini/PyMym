@@ -21,12 +21,13 @@ jobs:
                   python -m venv PyMym-Memr
                   ./PyMym-Memr/Scripts/python -m pip install --upgrade pip
                   ./PyMym-Memr/Scripts/pip install -r requirements.txt
-                  ./PyMym-Memr/Scripts/pip install pytest setuptools wheel
+                  ./PyMym-Memr/Scripts/pip install pytest setuptools wheel build
 
             - name: Build C++ Extension
               run: |
                   cmake -S. build -Ax64
                   cmake --build build -j
+                  ./PyMym-Memr/Scripts/python setup.py sdist bdist_wheel
                   ./PyMym-Memr/Scripts/pip install .
 
             - name: Force Installed Version
