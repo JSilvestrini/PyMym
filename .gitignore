@@ -10,3 +10,4 @@ tests/__pycache__
 PyMym/__pycache__
 src/PyMym/*.pyd
 .pytest_cache
+__pycache__
