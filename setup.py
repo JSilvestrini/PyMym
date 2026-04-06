@@ -7,7 +7,7 @@ setup(
     packages=find_packages(where="src", include=["PyMym"]),
     include_package_data=True,
     package_data={
-        "PyMym": ["*.pyd", "*.pyi"],
+        "PyMym": ["backend/*.pyd", "*.pyi"],
     },
     version='1.0.0',
     description='A Python library for memory manipulation in Windows',
