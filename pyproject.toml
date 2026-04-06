@@ -30,9 +30,6 @@ dependencies = [
 "Documentation" = "https://github.com/JSilvestrini/PyMym/blob/main/README.md"
 "Source" = "https://github.com/JSilvestrini/PyMym"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-
 [tool.setuptools_scm]
 write_to = "src/PyMym/_version.py"
 
