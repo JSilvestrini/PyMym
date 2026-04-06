@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 setup(
     name='PyMym',
     package_dir={"": "src"},
-    packages=find_packages(where="src"),
+    packages=find_packages(where="src", include=["PyMym"]),
     include_package_data=True,
     package_data={
         "PyMym": ["*.pyd", "*.pyi"],
