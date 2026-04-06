@@ -32,7 +32,8 @@ jobs:
 
             - name: Build C++ Extension
               run: |
-                  cmake -B build -S . -DPython3_EXECUTABLE=((Get-Command python).Source)
+                  $python_path = (Get-Command python).Source
+                  cmake -B build -S . "-DPython3_EXECUTABLE=$python_path"
                   cmake --build build
                   pip install .
 
