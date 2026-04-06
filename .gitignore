@@ -11,3 +11,4 @@ PyMym/__pycache__
 src/PyMym/*.pyd
 .pytest_cache
 __pycache__
+src/PyMym/backend/_lib*

@@ -1,0 +1,20 @@
+name: Production Release
+on:
+    push:
+        branches: ['main']
+
+jobs:
+    publish:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Build Wheel
+              run: |
+                  pip install build
+                  python -m build  # This creates the .whl and .tar.gz
+
+            - name: Publish to PyPI
+              uses: pypa/gh-action-pypi-publish@release/v1
+              with:
+                  password: ${{ secrets.PYPI_API_TOKEN }}
