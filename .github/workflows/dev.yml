@@ -27,7 +27,7 @@ jobs:
               run: |
                   cmake -S. build -Ax64
                   cmake --build build -j
-                  ./PyMym-Memr/Scripts/python -m pip install .
+                  ./PyMym-Memr/Scripts/pip install .
 
             #- name: Force Installed Version
             #run: Remove-Item -Path "./PyMym" -Recurse -Force
