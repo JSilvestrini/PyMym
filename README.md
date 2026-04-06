@@ -4,8 +4,8 @@
 
 [![GitHub License](https://img.shields.io/github/license/JSilvestrini/PyMym?style=plastic&color=darkred)](https://github.com/JSilvestrini/PyMym?tab=MIT-1-ov-file)
 ![Build Status](https://github.com/Jsilvestrini/PyMym/actions/workflows/dev.yml/badge.svg)
-[![PyPI version](https://img.shields.io/pypi/v/PyMym.svg)](https://pypi.org/project/PyMym/)
-[![Supported Versions](https://img.shields.io/pypi/pyversions/PyMym.svg)](https://pypi.org/project/PyMym/)
+[![PyPI - Version](https://img.shields.io/pypi/v/PyMym)](https://pypi.org/project/PyMym/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/PyMym)](https://pypi.org/project/PyMym/)
 ![OS](https://img.shields.io/badge/OS-windows-0078D4)
 [![GitHub repo size](https://img.shields.io/github/repo-size/JSilvestrini/PyMym?style=plastic)](https://github.com/JSilvestrini/PyMym)
 
@@ -33,7 +33,7 @@ PyMym is a Python memory manipulation library that allows quick and easy memory 
 - **C++ Core Performance**: Native execution for memory-intensive operations, bypassing the overhead of traditional Python wrappers.
 - **Pattern Matching**: High-speed Array of Bytes scanning to find stable hooks in frequently updating applications.
 - **Zero-Config Installation**: Pre-compiled binary wheels for Windows mean no local compiler is required for most users.
-    <!-- - **Memory-Safe Design**: Managed C++ backend handles pointer validation to prevent Python interpreter crashes during invalid reads. Need to do more checks before this can be claimed :( -->
+  <!-- - **Memory-Safe Design**: Managed C++ backend handles pointer validation to prevent Python interpreter crashes during invalid reads. Need to do more checks before this can be claimed :( -->
 - **Flexibility**: Simple Pythonic process wrapping for seamless memory manipulation or stand-alone memory manipulation without needing to use a class
 
 ## How to Use
