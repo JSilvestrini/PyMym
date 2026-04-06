@@ -29,8 +29,8 @@ jobs:
                   cmake --build build -j
                   ./PyMym-Memr/Scripts/python -m pip install .
 
-            - name: Force Installed Version
-              run: Remove-Item -Path "./PyMym" -Recurse -Force
+            #- name: Force Installed Version
+            #run: Remove-Item -Path "./PyMym" -Recurse -Force
 
             - name: Run Tests
               run: ./PyMym-Memr/Scripts/pytest
