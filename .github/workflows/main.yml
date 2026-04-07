@@ -26,10 +26,11 @@ jobs:
                   path: dist/*.tar.gz
 
     build_wheels:
-        name: Build wheels for ${{ matrix.python-version }}
-        runs-on: windows-latest
+        name: Build wheels for ${{ matrix.python-version }} on {{ matrix.os }}
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
+                os: [windows-latest]
                 python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
         steps:
@@ -39,6 +40,8 @@ jobs:
 
             - uses: astral-sh/setup-uv@v7
             - uses: pypa/cibuildwheel@v3.4
+              env:
+                  CIBW_BUILD: '${{ matrix.python-version }}-*'
 
             - name: Verify clean directory
               run: git diff --exit-code
@@ -46,7 +49,7 @@ jobs:
 
             - uses: actions/upload-artifact@v7
               with:
-                  name: wheels-${{ matrix.python-version }}
+                  name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
                   path: wheelhouse/*.whl
 
 #    publish:
