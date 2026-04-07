@@ -1,6 +1,6 @@
 [build-system]
-requires = ["scikit-build-core>=0.5", "pybind11", "setuptools-scm"]
-build-backend = "scikit-build-core.build"
+requires = ["scikit-build-core>=0.12", "pybind11"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "PyMym"
@@ -30,15 +30,30 @@ dependencies = [
 "Documentation" = "https://github.com/JSilvestrini/PyMym/blob/main/README.md"
 "Source" = "https://github.com/JSilvestrini/PyMym"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-
 [tool.setuptools_scm]
 write_to = "src/PyMym/_version.py"
 
+[dependency-groups]
+test = ["pytest"]
+dev = [{ include-group = "test" }]
+
 [tool.scikit-build]
-cmake.version = ">=3.18"
-ninja.make = true
-wheel.py-api = "cp310"
-sdist.include = ["src/PyMym/*"]
-logging.level = "INFO"
+minimum-version = "0.12"
+sdist.cmake = true
+wheel.cmake = true
+strict-config = true
+build.verbose = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+log_level = "INFO"
+testpaths = ["tests"]
+
+[tool.cibuildwheel]
+build-frontend = "build[uv]"
+enable = ["pypy"]
+test-command = "python -m pytest tests"
+test-sources = ["pyproject.toml", "tests"]
+test-groups = ["test"]
