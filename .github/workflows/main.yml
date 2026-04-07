@@ -26,12 +26,12 @@ jobs:
                   path: dist/*.tar.gz
 
     build_wheels:
-        name: Build wheels for ${{ matrix.python-version }} on {{ matrix.os }}
+        name: Build wheels for ${{ matrix.python-version }} on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
                 os: [windows-latest]
-                python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+                python-version: [cp310, cp311, cp312, cp313, cp314]
 
         steps:
             - uses: actions/checkout@v6
