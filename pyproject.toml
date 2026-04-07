@@ -1,6 +1,6 @@
 [build-system]
-requires = ["scikit-build-core>=0.12", "pybind11", "setuptools-scm"]
-build-backend = "scikit_build_core.build"
+requires = ["scikit-build-core>=0.12", "pybind11", "setuptools-scm>=9.2"]
+build-backend = "scikit_build_core.setuptools.build_meta"
 
 [project]
 name = "PyMym"
@@ -30,9 +30,6 @@ dependencies = [
 "Documentation" = "https://github.com/JSilvestrini/PyMym/blob/main/README.md"
 "Source" = "https://github.com/JSilvestrini/PyMym"
 
-[tool.setuptools_scm]
-write_to = "src/PyMym/_version.py"
-
 [dependency-groups]
 test = ["pytest"]
 dev = [{ include-group = "test" }]
@@ -43,7 +40,11 @@ sdist.cmake = true
 wheel.cmake = true
 strict-config = true
 build.verbose = true
-metadata.version.provider = "scikit-build-core.metadata.setuptools_scm"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["src/package/_version.py"]
+
+[tool.setuptools_scm]
+write_to = "src/PyMym/_version.py"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
