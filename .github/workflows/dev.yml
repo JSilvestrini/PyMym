@@ -16,29 +16,18 @@ jobs:
             matrix:
                 python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.python-version }}
 
-            - name: Python Setup
-              run: |
-                  python -m pip install --upgrade pip
-                  pip install pybind11 pytest scikit-build-core setuptools-scm build pywin32
+            - name: Build and install
+              run: pip install --verbose . --group test
 
-            - name: Build Wheel
-              run: python -m build --wheel --no-isolation
-
-            - name: Install from Wheel
-              run: pip install (Get-ChildItem dist/*.whl).FullName
-
-            - name: Run Tests
-              run: |
-                  mkdir test_run
-                  cd test_run
-                  pytest ../tests
+            - name: Test
+              run: pytest
 
     create_pr:
         needs: dev-test

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.5", "setuptools-scm>=8.0", "pybind11"]
+requires = ["scikit-build-core>=0.5", "pybind11"]
 build-backend = "scikit-build-core.build"
 
 [project]
@@ -33,9 +33,27 @@ dependencies = [
 [tool.setuptools_scm]
 write_to = "src/PyMym/_version.py"
 
+[dependency-groups]
+test = ["pytest"]
+dev = [{ include-group = "test" }]
+
 [tool.scikit-build]
-cmake.version = ">=3.18"
-ninja.make = true
-wheel.py-api = "cp310"
-sdist.include = ["src/PyMym/*"]
-logging.level = "INFO"
+minimum-version = "build-system.requires"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+log_level = "INFO"
+filterwarnings = [
+  "error",
+  "ignore::pytest.PytestCacheWarning",
+]
+testpaths = ["tests"]
+
+[tool.cibuildwheel]
+build-frontend = "build[uv]"
+enable = ["pypy"]
+test-command = "python -m pytest tests"
+test-sources = ["pyproject.toml", "tests"]
+test-groups = ["test"]
