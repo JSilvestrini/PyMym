@@ -57,3 +57,8 @@ enable = ["pypy"]
 test-command = "python -m pytest tests"
 test-sources = ["pyproject.toml", "tests"]
 test-groups = ["test"]
+
+[tool.cibuildwheel.windows]
+skip = [
+    "*-win32",
+]
