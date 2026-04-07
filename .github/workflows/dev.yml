@@ -24,7 +24,7 @@ jobs:
                   python-version: ${{ matrix.python-version }}
 
             - name: Build and install
-              run: pip install --verbose . --group test
+              run: pip install --no-isolation --config-settings=editable.rebuild=true -ve
 
             - name: Test
               run: pytest
