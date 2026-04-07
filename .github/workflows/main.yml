@@ -49,26 +49,26 @@ jobs:
                   name: wheels-${{ matrix.python-version }}
                   path: wheelhouse/*.whl
 
-    publish:
-        name: Publish to PyPI
-        needs: [build_sdist, build_wheels]
-        runs-on: ubuntu-latest
-        environment: pypi
-        permissions:
-            id-token: write
-            attestations: write
-        steps:
-            - name: Download Wheels
-              uses: actions/download-artifact@v8
-              with:
-                  path: dist
-                  pattern: wheels-*
-                  merge-multiple: true
-
-            - name: Generate artifact attestation for sdist and wheels
-              uses: actions/attest-build-provenance@v4
-              with:
-                  subject-path: 'dist/*'
-
-            - name: Publish to PyPI
-              uses: pypa/gh-action-pypi-publish@release/v1
+#    publish:
+#        name: Publish to PyPI
+#        needs: [build_sdist, build_wheels]
+#        runs-on: ubuntu-latest
+#        environment: pypi
+#        permissions:
+#            id-token: write
+#            attestations: write
+#        steps:
+#            - name: Download Wheels
+#              uses: actions/download-artifact@v8
+#              with:
+#                  path: dist
+#                  pattern: wheels-*
+#                  merge-multiple: true
+#
+#            - name: Generate artifact attestation for sdist and wheels
+#              uses: actions/attest-build-provenance@v4
+#              with:
+#                  subject-path: 'dist/*'
+#
+#            - name: Publish to PyPI
+#              uses: pypa/gh-action-pypi-publish@release/v1
