@@ -23,14 +23,22 @@ jobs:
               with:
                   python-version: ${{ matrix.python-version }}
 
-            - name: Build and Install PyMym
+            - name: Python Setup
               run: |
                   python -m pip install --upgrade pip
                   pip install pybind11 pytest scikit-build-core setuptools-scm
-                  pip install --no-build-isolation .
+
+            - name: Build Wheel
+              run: python -m build --wheel
+
+            - name: Install from Wheel
+              run: pip install (Get-ChildItem dist/*.whl).FullName
 
             - name: Run Tests
-              run: pytest
+              run: |
+                  mkdir test_run
+                  cd test_run
+                  pytest ../tests
 
     create_pr:
         needs: dev-test
