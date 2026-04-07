@@ -26,7 +26,7 @@ jobs:
             - name: Build and install
               run: |
                   pip install pybind11 pytest scikit-build-core
-                  pip install --no-isolation -v .
+                  pip install --no-build-isolation -v .
 
             - name: Test
               run: pytest
