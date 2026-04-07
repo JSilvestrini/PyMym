@@ -29,7 +29,7 @@ jobs:
                   pip install pybind11 scikit-build-core setuptools-scm build
 
             - name: Build Wheel
-              run: python -m build --wheel
+              run: python -m build --wheel --no-build-isolation
 
             - name: Upload Wheel Artifact
               uses: actions/upload-artifact@v4

@@ -29,7 +29,7 @@ jobs:
                   pip install pybind11 pytest scikit-build-core setuptools-scm build
 
             - name: Build Wheel
-              run: python -m build --wheel
+              run: python -m build --wheel --no-build-isolation
 
             - name: Install from Wheel
               run: pip install (Get-ChildItem dist/*.whl).FullName
