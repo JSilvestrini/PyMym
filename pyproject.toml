@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.12", "pybind11"]
+requires = ["scikit-build-core>=0.12", "pybind11", "setuptools-scm"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -43,6 +43,7 @@ sdist.cmake = true
 wheel.cmake = true
 strict-config = true
 build.verbose = true
+metadata.version.provider = "scikit-build-core.metadata.setuptools_scm"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
