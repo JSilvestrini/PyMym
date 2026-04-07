@@ -24,7 +24,9 @@ jobs:
                   python-version: ${{ matrix.python-version }}
 
             - name: Build and install
-              run: pip install --no-isolation --config-settings=editable.rebuild=true -ve
+              run: |
+                  pip install pybind11 pytest scikit-build-core
+                  pip install --no-isolation -v .
 
             - name: Test
               run: pytest

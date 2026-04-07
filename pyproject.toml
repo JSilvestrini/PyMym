@@ -1,6 +1,6 @@
 [build-system]
-requires = ["scikit-build-core>=0.5", "pybind11"]
-build-backend = "scikit-build-core.build"
+requires = ["scikit-build-core>=0.12", "pybind11"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "PyMym"
@@ -38,18 +38,17 @@ test = ["pytest"]
 dev = [{ include-group = "test" }]
 
 [tool.scikit-build]
-minimum-version = "build-system.requires"
-build-dir = "build"
+minimum-version = "0.12"
+sdist.cmake = true
+wheel.cmake = true
+strict-config = true
+build.verbose = true
 
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 log_level = "INFO"
-filterwarnings = [
-  "error",
-  "ignore::pytest.PytestCacheWarning",
-]
 testpaths = ["tests"]
 
 [tool.cibuildwheel]
