@@ -44,6 +44,7 @@ jobs:
             - uses: pypa/cibuildwheel@v3.4
               env:
                   CIBW_BUILD: '${{ matrix.python-version }}-*'
+                  SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.ref_name }}
 
             - name: Verify clean directory
               run: git diff --exit-code
@@ -58,7 +59,9 @@ jobs:
         name: Publish to PyPI
         needs: [build_sdist, build_wheels]
         runs-on: ubuntu-latest
-        environment: pypi
+        environment:
+            name: pypi
+            url: https://pypi.org/project/PyMym/
         permissions:
             id-token: write
             attestations: write
@@ -71,7 +74,7 @@ jobs:
                   merge-multiple: true
 
             - name: Generate artifact attestation for sdist and wheels
-              uses: actions/attest-build-provenance@v4
+              uses: actions/attest@v4
               with:
                   subject-path: 'dist/*'
 
